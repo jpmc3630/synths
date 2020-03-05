@@ -5,9 +5,13 @@
   "private": true,
   "proxy": "http://localhost:3001/",
   "dependencies": {
+    "d3-simple-slider": "^1.5.4",
     "react": "^16.6.3",
+    "react-d3-library": "^1.1.8",
     "react-dom": "^16.6.3",
-    "react-scripts": "^2.1.1"
+    "react-router": "^5.1.2",
+    "react-scripts": "^2.1.1",
+    "webmidi": "^2.5.1"
   },
   "scripts": {
     "start": "react-scripts start",
