@@ -163,7 +163,7 @@ class Synth extends Component {
                     : statusArr.map((param, index) => (
                         <div key={'param' + index}>
                         {index} : {param}
-                        <Knob 
+                        {/* <Knob 
                             key={'paramknob' + index}
                             onChange={this.updateOneParam.bind(this, index)} 
                             clampMin={0} clampMax={360} rotateDegrees={180}
@@ -171,7 +171,7 @@ class Synth extends Component {
                             value={this.state.statusArr[index]}
                             preciseMode={false} style={knobStyle}
                             skin={skins.s15}
-                        />
+                        /> */}
                             
                         <Slider
                             key={'paramslider' + index}
