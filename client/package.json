@@ -5,10 +5,15 @@
   "private": true,
   "proxy": "http://localhost:3001/",
   "dependencies": {
+    "@material-ui/core": "^4.9.5",
+    "d3": "^5.15.0",
     "d3-simple-slider": "^1.5.4",
+    "material-ui": "^0.20.2",
     "react": "^16.6.3",
     "react-d3-library": "^1.1.8",
     "react-dom": "^16.6.3",
+    "react-rotary-knob": "^1.1.8",
+    "react-rotary-knob-skin-pack": "^1.0.2",
     "react-router": "^5.1.2",
     "react-scripts": "^2.1.1",
     "webmidi": "^2.5.1"
