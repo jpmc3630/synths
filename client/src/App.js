@@ -11,7 +11,8 @@ import "./App.css";
 import Host from "./components/Host";
 import Join from "./components/Join";
 
-import socketIOClient from "socket.io-client";
+import io from "socket.io-client";
+
 
 
 class App extends Component {
@@ -20,28 +21,44 @@ class App extends Component {
     super();
     this.state = {
       response: false,
-      endpoint: "http://127.0.0.1:3001"
+      endpoint: "http://127.0.0.1:4001",
+      socket: false
     };
   }
 
   componentDidMount() {
-    const { endpoint } = this.state;
-    const socket = socketIOClient(endpoint);
-    socket.on("message", data => this.setState({ response: data }));
+    // const { endpoint } = this.state;
+    // const socket = socketIOClient(endpoint);
+    // socket.on("FromAPI", data => this.setState({ response: data }));
+
+    const socketVar = io();
+    this.setState({socket: socketVar})
+    
+    socketVar.on("message", data => this.setState({ response: data }));
+    
   }
 
+
+  sendMSG = () => {
+    this.state.socket.emit("message", "hello");
+  }
+
+
   render() {
+
     const { response } = this.state;
+
     return (
 
       <Router>
       <div>
-
       {response
               ? <p>
-                The temperature in Florence is: {response} °F
+                The message is: {response}
               </p>
-              : <p>Loading...</p>}
+              : <p>No message received yet...</p>}
+
+        <button onClick={this.sendMSG}>test</button>
 
         <ul>
           <li>
