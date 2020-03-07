@@ -34,5 +34,7 @@ const server = app.listen(PORT, () => {
 var io = require('socket.io')(server);
 
 io.on('connection', function(socket){
-  console.log('a user connected');
+  socket.on('message', function(msg){
+    io.emit('message', msg);
+  });
 });
