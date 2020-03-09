@@ -2,16 +2,15 @@ import React, { Component } from "react";
 
 import Synth from "./Synth"
 
+
 class Host extends Component {
-    constructor(){
-      super();
+    constructor(props){
+      super(props);
       this.state = {
         data: []
+        
       };
    }
-
-
-
 
 
     render() {
@@ -20,6 +19,7 @@ class Host extends Component {
         
         <div>
           Hosting page
+
         <Synth />
 
         </div>

@@ -11,9 +11,11 @@ import "./App.css";
 import Host from "./components/Host";
 import Join from "./components/Join";
 
+import SocketContext from './context/socket-context';
 import io from "socket.io-client";
 
 
+let socket = io(`http://localhost:3001/`);
 
 class App extends Component {
 
@@ -21,7 +23,7 @@ class App extends Component {
     super();
     this.state = {
       response: false,
-      endpoint: "http://127.0.0.1:4001",
+      endpoint: "http://127.0.0.1:3001",
       socket: false
     };
   }
@@ -30,18 +32,12 @@ class App extends Component {
     // const { endpoint } = this.state;
     // const socket = socketIOClient(endpoint);
     // socket.on("FromAPI", data => this.setState({ response: data }));
-
-    const socketVar = io();
-    this.setState({socket: socketVar})
-    
-    socketVar.on("message", data => this.setState({ response: data }));
     
   }
 
 
-  sendMSG = () => {
-    this.state.socket.emit("message", "hello");
-  }
+
+
 
 
   render() {
@@ -50,39 +46,38 @@ class App extends Component {
 
     return (
 
-      <Router>
-      <div>
-      {response
-              ? <p>
-                The message is: {response}
-              </p>
-              : <p>No message received yet...</p>}
+      <SocketContext.Provider value={socket}>
+     
+        <Router>
+          <div>
 
-        <button onClick={this.sendMSG}>test</button>
+            <button onClick={this.sendMSG}>test</button>
 
-        <ul>
-          <li>
-            <Link to="/">Host Synth</Link>
-          </li>
-          <li>
-            <Link to="/join">Join Synth</Link>
-          </li>
-        </ul>
+            <ul>
+              <li>
+                <Link to="/">Host Synth</Link>
+              </li>
+              <li>
+                <Link to="/join">Join Synth</Link>
+              </li>
+            </ul>
 
-        <hr />
+            <hr />
 
 
 
-        <Switch>
-          <Route exact path="/">
-            <Host />
-          </Route>
-          <Route path="/join">
-            <Join />
-          </Route>
-        </Switch>
-      </div>
-    </Router>
+            <Switch>
+              <Route exact path="/">
+                <Host />
+              </Route>
+              <Route path="/join">
+                <Join />
+              </Route>
+            </Switch>
+          </div>
+        </Router>
+    
+      </SocketContext.Provider>
 
     );
   }

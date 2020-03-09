@@ -8,7 +8,7 @@ import * as skins from "react-rotary-knob-skin-pack";
 
 import Slider from '@material-ui/core/Slider';
 
-class Synth extends Component {
+class RemoteSynth extends Component {
     constructor(props){
       super(props);
       this.state = {
@@ -16,86 +16,45 @@ class Synth extends Component {
         highlightedParam: null,
         inputs: [],
         outputs: [],
-        conToSynth: false,
+        conToHost: false,
         value: 50,
-        paramCount: 75,
-        currentRoom: null
+        currentRoom: this.props.currentRoom
       };
     }
     
 
     componentDidMount() {
 
-        WebMidi.enable( (err) => {
-            console.log(WebMidi.inputs);
-            console.log(WebMidi.outputs);
+
+
+
+        console.log('component did mount');
+        this.props.socket.on('status', data => {
+            console.log('Recievy the status');
+            console.log('Incoming statusArr:', data);
+            this.setState({ statusArr: data })
+        });
+
+        // WebMidi.enable( (err) => {
+        //     console.log(WebMidi.inputs);
+        //     console.log(WebMidi.outputs);
             
-            //connect automatically, generate random patch while in dev
-            // this.recieveCC();
-            // this.randomPatch();
-            
-        }, true);   
+        // }, true);   
+
+        this.requestStatusArr();
+
     }
     
     componentWillUnmount() {
-
-        this.props.socket.emit('removeHost');
-
+        this.props.socket.emit('removeUser'); //needs removeUser function in server
     }
 
-    addHost = () => {
-        // this.props.socket.emit("hosts", "ms2000 Host Available");
-
-          /**
-         * Gets fired when a user wants to create a new room.
-         */
-
-         
-        // socket.on('createRoom', (roomName, callback) => {
-        //     const room = {
-        //     id: uuid(), // generate a unique id for the new room, that way we don't need to deal with duplicates.
-        //     name: roomName,
-        //     sockets: []
-        //     };
-        //     rooms[room.id] = room;
-        //     // have the socket join the room they've just created.
-        //     joinRoom(socket, room);
-        //     callback();
-        // });
-        
-        // let's assume that the client page, once rendered, knows what room it wants to join
-        // var room = this.props.socket.id;
-        console.log('add host function');
-
-        // this.props.socket.on('connect', function() {
-        //     console.log('connected');
-        // // Connected, let's sign-up for to receive messages for this room
-        let fish = 'room' + this.rndVal() + this.rndVal();
-        console.log(fish);
-        this.setState({currentRoom: fish});
-        this.props.socket.emit('room', fish);
-        console.log('emitting to room' + fish);
-        // });
+    requestStatusArr = () => {
+        this.props.socket.emit('msg', {room: this.state.currentRoom, msg: `RequestConfig`});
+      }
 
 
-
-        this.props.socket.on('msg', (data) => {
-            console.log(data);
-            if (data === 'RequestConfig') {
-                this.sendStatusArr();
-            }
-
-        });
-
-    }
-
-    sendStatusArr = () => {
-        console.log('sendy the status:');
-        console.log({room: this.state.currentRoom, msg: this.state.StatusArr});
-        this.props.socket.emit('status', {room: this.state.currentRoom, msg: this.state.statusArr});
-    }
-
-    CC = (cc, value) => {
+    SendCC = (cc, value) => {
         let output = WebMidi.getOutputByName("UM-1");
         output.sendControlChange(cc, value);
     }
@@ -105,45 +64,14 @@ class Synth extends Component {
         return rndNum;
     }
 
-    randomPatch = () => {
-        let newStatusArr = [];
-        //120 for all CC params
-        for (let i = 0 ; i < 75; i++) {
-            let rndNum = this.rndVal();
-            
-            // set the synth
-            this.CC(i, rndNum);
+    requestRandomPatch = () => {
 
-            // set srray
-            newStatusArr[i] = rndNum;
-            
-        }
-        this.setState({statusArr: newStatusArr});
     }
 
 
-
-
-        // console.log(val);
-        // console.log(i);
-        // this.setState(state => {
-        //   const newArr = state.statusArr.map((item, j) => {
-        //     if (j === i) {
-        //       return v;
-        //     } else {
-        //       return item;
-        //     }
-        //   });
-        //   return {
-        //     statusArr: newArr,
-        //     highlightedParam: i
-        //   };
-        // });
-
-
-
     // adjust all notes
-    recieveCC = () => {
+    recieveStatus = () => {
+        
         var input = WebMidi.getInputByName("UM-1");
         input.addListener('controlchange', "all", (e) => {
         //   console.log("Received 'controlchange' message.", e);
@@ -186,7 +114,7 @@ class Synth extends Component {
                 let rv = Math.round(value);
                 const newArr = this.state.statusArr;
                 newArr[i] = rv;
-                this.setState({statusArr: newArr, highlightedParam: i});
+                this.setState({statusArr: newArr});
             }
         }
     };
@@ -211,11 +139,9 @@ class Synth extends Component {
             <div className="container-fluid pb-3">
                 <div className="row justify-content-md-center">
                 
-                {this.state.conToSynth ? 
-                <div>Connected to Synth<button onClick={this.randomPatch}>Randomize Patch</button></div>
-                
-                : <button onClick={() => {this.recieveCC(); this.randomPatch();}}>Connect to Synth</button>
-                }
+                {this.state.conToHost ? 
+                <div>Connected to Host<button onClick={this.requestRandomPatch}>Request Random Patch</button></div>
+                : <div>Not connected to Host Synth</div>}
 
                 <div style={{ columnCount:4}}>
                 
@@ -260,10 +186,10 @@ class Synth extends Component {
     }
 }
   
-const SynthWithSocket = props => (
+const RemoteSynthWithSocket = props => (
     <SocketContext.Consumer>
-    {socket => <Synth {...props} socket={socket} />}
+    {socket => <RemoteSynth {...props} socket={socket} />}
     </SocketContext.Consumer>
   )
     
-  export default SynthWithSocket;
+  export default RemoteSynthWithSocket;
