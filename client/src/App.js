@@ -15,7 +15,7 @@ import SocketContext from './context/socket-context';
 import io from "socket.io-client";
 
 
-let socket = io(`http://localhost:3001/`);
+let socket = io();
 
 class App extends Component {
 
@@ -23,7 +23,6 @@ class App extends Component {
     super();
     this.state = {
       response: false,
-      endpoint: "http://127.0.0.1:3001",
       socket: false
     };
   }
