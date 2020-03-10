@@ -45,12 +45,11 @@ class Join extends Component {
 
     render() {
   
-      if(this.state.currentRoom == null) {
+      if(this.state.currentRoom === null) {
         return (
           
               <div>
                 Join page
-
 
                 {this.state.hostsArr.length <= 0
                     ? <p>No synth hosts available right now...</p>
@@ -58,10 +57,7 @@ class Join extends Component {
                       Host Available: {index} : {host.hostSocket}: {host.room} : {host.userCount} : <button onClick={() => this.connectToRoom(host.room)}>Join</button>
                     </p> ))}
                     
-                    
-                    
-
-                    
+                    <div>Not connected to Host Synth</div>
 
               </div>
               );
@@ -69,6 +65,7 @@ class Join extends Component {
           } else {
         return (
             <div>
+              <div>Connected to Host</div>
               <RemoteSynth currentRoom={this.state.currentRoom} />
             </div>
         )

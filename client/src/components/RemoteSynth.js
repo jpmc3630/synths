@@ -26,9 +26,6 @@ class RemoteSynth extends Component {
     componentDidMount() {
 
 
-
-
-        console.log('component did mount');
         this.props.socket.on('status', data => {
             console.log('Recievy the status');
             console.log('Incoming statusArr:', data);
@@ -113,8 +110,12 @@ class RemoteSynth extends Component {
             if (value) {
                 let rv = Math.round(value);
                 const newArr = this.state.statusArr;
+
                 newArr[i] = rv;
                 this.setState({statusArr: newArr});
+
+                this.props.socket.emit('CC', {room: this.state.currentRoom, msg: { param: i, value: rv}});
+
             }
         }
     };
@@ -139,14 +140,12 @@ class RemoteSynth extends Component {
             <div className="container-fluid pb-3">
                 <div className="row justify-content-md-center">
                 
-                {this.state.conToHost ? 
-                <div>Connected to Host<button onClick={this.requestRandomPatch}>Request Random Patch</button></div>
-                : <div>Not connected to Host Synth</div>}
-
+                <button onClick={this.requestRandomPatch}>Request Random Patch</button>
+                
                 <div style={{ columnCount:4}}>
                 
                     {statusArr.length <= 0
-                    ? <div className="status-div">Loading params</div>
+                    ? <div className="status-div">Loading params...</div>
                     : statusArr.map((param, index) => (
                         <div key={'param' + index}>
                         {index} : {param}

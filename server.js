@@ -78,9 +78,14 @@ io.sockets.on('connection', function(socket) {
     });
     // redirecting statusArr to right room
     socket.on('status', function(data) {
-      console.log('passing status message');
+      console.log('passing status message:');
       console.log(data);
       io.sockets.in(data.room).emit('status', data.msg);
+    });
+    socket.on('CC', function(data) {
+      console.log('passing CC message:');
+      console.log(data);
+      io.sockets.in(data.room).emit('CC', data.msg);
     });
 
 

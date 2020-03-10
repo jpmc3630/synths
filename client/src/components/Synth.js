@@ -6,7 +6,9 @@ import { render } from "react-dom";
 import { Knob } from "react-rotary-knob";
 import * as skins from "react-rotary-knob-skin-pack";
 
-import Slider from '@material-ui/core/Slider';
+// import Slider from '@material-ui/core/Slider';
+// import TouchKnob from "react-touch-knob"
+
 
 class Synth extends Component {
     constructor(props){
@@ -22,19 +24,18 @@ class Synth extends Component {
         currentRoom: null
       };
     }
-    
+
 
     componentDidMount() {
 
         WebMidi.enable( (err) => {
             console.log(WebMidi.inputs);
-            console.log(WebMidi.outputs);
-            
-            //connect automatically, generate random patch while in dev
-            // this.recieveCC();
-            // this.randomPatch();
-            
+            console.log(WebMidi.outputs); 
         }, true);   
+
+            
+
+
     }
     
     componentWillUnmount() {
@@ -44,48 +45,24 @@ class Synth extends Component {
     }
 
     addHost = () => {
-        // this.props.socket.emit("hosts", "ms2000 Host Available");
 
-          /**
-         * Gets fired when a user wants to create a new room.
-         */
-
-         
-        // socket.on('createRoom', (roomName, callback) => {
-        //     const room = {
-        //     id: uuid(), // generate a unique id for the new room, that way we don't need to deal with duplicates.
-        //     name: roomName,
-        //     sockets: []
-        //     };
-        //     rooms[room.id] = room;
-        //     // have the socket join the room they've just created.
-        //     joinRoom(socket, room);
-        //     callback();
-        // });
-        
-        // let's assume that the client page, once rendered, knows what room it wants to join
-        // var room = this.props.socket.id;
-        console.log('add host function');
-
-        // this.props.socket.on('connect', function() {
-        //     console.log('connected');
-        // // Connected, let's sign-up for to receive messages for this room
         let fish = 'room' + this.rndVal() + this.rndVal();
-        console.log(fish);
         this.setState({currentRoom: fish});
         this.props.socket.emit('room', fish);
         console.log('emitting to room' + fish);
-        // });
-
-
 
         this.props.socket.on('msg', (data) => {
             console.log(data);
             if (data === 'RequestConfig') {
                 this.sendStatusArr();
             }
-
         });
+
+        this.props.socket.on('CC', (data) => {
+            console.log('recieved CC message:');
+            console.log(data);
+            this.updateOneParam(data.param, data.value);
+          });
 
     }
 
@@ -122,26 +99,6 @@ class Synth extends Component {
     }
 
 
-
-
-        // console.log(val);
-        // console.log(i);
-        // this.setState(state => {
-        //   const newArr = state.statusArr.map((item, j) => {
-        //     if (j === i) {
-        //       return v;
-        //     } else {
-        //       return item;
-        //     }
-        //   });
-        //   return {
-        //     statusArr: newArr,
-        //     highlightedParam: i
-        //   };
-        // });
-
-
-
     // adjust all notes
     recieveCC = () => {
         var input = WebMidi.getInputByName("UM-1");
@@ -159,12 +116,19 @@ class Synth extends Component {
     }
 
     updateOneParam(i, v){
-        console.log(v)
+
         let rv = Math.round(v);
-        const newArr = this.state.statusArr;
-        this.handleSliderChange(i, rv)
-        newArr[i] = rv;
-        this.setState({statusArr: newArr, highlightedParam: i});
+
+        if (rv != this.state.statusArr[i]) {
+            console.log(rv)
+            const newArr = this.state.statusArr;
+            
+            // this.handleSliderChange(i, rv)
+            newArr[i] = rv;
+            this.setState({statusArr: newArr});
+
+            this.CC(i, rv);
+        }
     };
 
     handleSliderChange(i, e) {
@@ -186,18 +150,35 @@ class Synth extends Component {
                 let rv = Math.round(value);
                 const newArr = this.state.statusArr;
                 newArr[i] = rv;
-                this.setState({statusArr: newArr, highlightedParam: i});
+                this.setState({statusArr: newArr});
             }
         }
     };
 
+    sliderChange = (i, v) => {
+        // let tempArr = this.state.statusArr;
+        // tempArr[param] = val;
+        // this.setState({statusArr: tempArr});
+        console.log(i);
+        console.log('2: '+ v);
+        // let target = document.querySelectorAll('.slidecontainer')[i];
+        // let input = target.querySelector('value');
+        // console.log(input);
+    }
 
     render() {
   
+        // var slider = document.getElementById("myRange");
+ 
+        // // Update the current slider value (each time you drag the slider handle)
+        // slider.oninput = function() {
+        //   output.innerHTML = this.value;
+        // }
+
         const knobStyle = {
             width: "40px",
             height: "40px",
-            display: "inline-block"
+            display: "inline-block",
           };
 
           const sliderStyle = {
@@ -221,27 +202,50 @@ class Synth extends Component {
                 
                     {statusArr.length <= 0
                     ? <div className="status-div">Loading params</div>
-                    : statusArr.map((param, index) => (
-                        <div key={'param' + index}>
-                        {index} : {param}
-                        {/* <Knob 
-                            key={'paramknob' + index}
-                            onChange={this.updateOneParam.bind(this, index)} 
+                    : statusArr.map((param, asd) => (
+                        <div key={asd}>
+                        {asd} : {param}
+                        <Knob 
+                            key={'paramknob' + asd}
+                            onChange={this.updateOneParam.bind(this, asd)} 
                             clampMin={0} clampMax={360} rotateDegrees={180}
                             min={0} max={127} 
-                            value={this.state.statusArr[index]}
-                            preciseMode={false} style={knobStyle}
+                            value={this.state.statusArr[asd]}
+                            preciseMode={true} 
+                            style={knobStyle}
                             skin={skins.s15}
-                        /> */}
+                        />
                             
-                        <Slider
-                            key={'paramslider' + index}
-                            defaultValue={this.state.statusArr[index]}
-                            onChange={this.handleSliderChange.bind(this, index)}
+                        {/* <Slider
+                            key={'paramslider' + asd}
+                            defaultValue={this.state.statusArr[asd]}
+                            
+                            onChange={this.handleSliderChange.bind(this, asd)}
+                            
                             aria-labelledby="input-slider"
                             min={0} max={127} style={sliderStyle}
                             valueLabelDisplay="auto"
-                        />
+                        /> */}
+
+
+                    {/* <div className="slidecontainer">
+                        <input type="range" min="1" max="127" defaultValue={this.state.statusArr[asd]} onInput={this.sliderChange.bind(this)} className="slider" id="myRange"></input>
+                    </div> */}
+
+                        
+{/* 
+                    <TouchKnob
+                        class="my-knob-class"
+                        name="score"
+                        min="0"
+                        max="127"
+                        value={this.state.statusArr[asd]}
+                        
+                        onEnd={this.sliderChange.bind(asd, this)}
+                        showNumber={true} 
+                        round={true}
+                        fineness={2}
+                        /> */}
 
                         </div>
                         // this.state.highlightedParam === index ?
