@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 
-import HostSynth from "./HostSynth"
+import LocalSynth from "./LocalSynth"
 
 
-class Host extends Component {
+class Local extends Component {
     constructor(props){
       super(props);
       this.state = {
@@ -18,13 +18,13 @@ class Host extends Component {
       return (
         
         <div>
-          Hosting page
+          Local Mode
 
-        <HostSynth />
+        <LocalSynth />
 
         </div>
       );
     }
   }
   
-  export default Host;
+  export default Local;

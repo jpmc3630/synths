@@ -6,6 +6,7 @@
   "proxy": "http://localhost:3001/",
   "dependencies": {
     "@material-ui/core": "^4.9.5",
+    "antd": "^4.0.2",
     "d3": "^5.15.0",
     "d3-simple-slider": "^1.5.4",
     "material-ui": "^0.20.2",
@@ -16,6 +17,7 @@
     "react-rotary-knob-skin-pack": "^1.0.2",
     "react-router": "^5.1.2",
     "react-scripts": "^2.1.1",
+    "react-slider": "^1.0.3",
     "react-touch-knob": "^0.2.3",
     "socket.io-client": "^2.3.0",
     "webmidi": "^2.5.1"

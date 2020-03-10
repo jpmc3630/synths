@@ -8,6 +8,7 @@ import {
 
 import "./App.css";
 
+import Local from "./components/Local";
 import Host from "./components/Host";
 import Join from "./components/Join";
 
@@ -15,7 +16,7 @@ import SocketContext from './context/socket-context';
 import io from "socket.io-client";
 
 
-let socket = io();
+let socket = io(`http://localhost:3001/`);
 
 class App extends Component {
 
@@ -53,8 +54,11 @@ class App extends Component {
             <button onClick={this.sendMSG}>test</button>
 
             <ul>
+            <li>
+                <Link to="/local">Local Mode</Link>
+              </li>
               <li>
-                <Link to="/">Host Synth</Link>
+                <Link to="/host">Host Synth</Link>
               </li>
               <li>
                 <Link to="/join">Join Synth</Link>
@@ -66,7 +70,10 @@ class App extends Component {
 
 
             <Switch>
-              <Route exact path="/">
+              <Route exact path="/local">
+                <Local />
+              </Route>
+              <Route exact path="/host">
                 <Host />
               </Route>
               <Route path="/join">
