@@ -6,6 +6,7 @@ import Slider from '@material-ui/core/Slider';
 import Dropdown from 'rc-dropdown';
 import Menu, { Item as MenuItem, Divider } from 'rc-menu';
 import 'rc-dropdown/assets/index.css';
+const { RTCPeerConnection, RTCSessionDescription } = window;
 
 class RemoteSynth extends Component {
     constructor(props){
@@ -18,14 +19,20 @@ class RemoteSynth extends Component {
         conToHost: false,
         value: 50,
         currentRoom: this.props.currentRoom,
-        viewColumns: 1
+        viewColumns: 1,
+        peerConnection: new RTCPeerConnection()
       };
     }
     
 
     componentDidMount() {
 
+        
+        
+        // const asdasd = new RTCPeerConnection();
+        // this.setState({peerConnection: asdasd});
 
+        // listner for socketIO data for statusArr
         this.props.socket.on('status', data => {
             console.log('Recievy the status');
             console.log('Incoming statusArr:', data);
@@ -39,6 +46,31 @@ class RemoteSynth extends Component {
         // }, true);   
 
         this.requestStatusArr();
+
+        // listener for RTC call
+            this.props.socket.on("call-made", async data => {
+                await this.state.peerConnection.setRemoteDescription(
+                new RTCSessionDescription(data.offer)
+                );
+            const answer = await this.state.peerConnection.createAnswer();
+            await this.state.peerConnection.setLocalDescription(new RTCSessionDescription(answer));
+            
+                this.props.socket.emit("make-answer", {
+                    answer,
+                    to: data.socket
+                });
+           });
+
+           this.state.peerConnection.ontrack = function({ streams: [stream] }) {
+            const remoteVideo = document.getElementById("remote-video");
+            if (remoteVideo) {
+            remoteVideo.srcObject = stream;
+            }
+       };
+       
+        console.log('sending initiate video to room');
+           console.log(this.state.currentRoom);
+        this.props.socket.emit('initiate-video', {room: this.state.currentRoom, msg: this.props.socket.id});
 
     }
     
@@ -109,6 +141,14 @@ class RemoteSynth extends Component {
 
     onColumnSelect = ({key}) => {
         this.setState({viewColumns: key});
+
+        this.state.peerConnection.ontrack = function({ streams: [stream] }) {
+            const remoteVideo = document.getElementById("remote-video");
+            if (remoteVideo) {
+            remoteVideo.srcObject = stream;
+            }
+       };
+
       }
 
     render() {
@@ -129,6 +169,7 @@ class RemoteSynth extends Component {
             color: "white"
         };
 
+        
         const { statusArr } = this.state;
         return (
             <div className="container-fluid pb-3">
@@ -168,6 +209,11 @@ class RemoteSynth extends Component {
                         </div>
 
                     ))}
+                </div>
+
+                <div className="video-container">
+                    <video autoPlay className="remote-video" id="remote-video"></video>
+                    <video autoPlay muted className="local-video" id="local-video"></video>
                 </div>
 
             </div>

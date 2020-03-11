@@ -93,6 +93,10 @@ io.sockets.on('connection', function(socket) {
       io.sockets.in(data.room).emit('Func', data.msg);
     });
 
+
+
+
+
     // join room, for joiners
     socket.on('joinRoom', function(roomName) {
 
@@ -153,4 +157,43 @@ io.sockets.on('connection', function(socket) {
 
     });
 
+
+    //web rtc stuff
+
+
+    
+    socket.on('initiate-video', function(data) {
+      console.log('passing initate-video message:');
+      console.log(data);
+      io.sockets.in(data.room).emit('initiate-video', data.msg);
+    });
+
+
+
+    socket.on("call-user", data => {
+      socket.to(data.to).emit("call-made", {
+        offer: data.offer,
+        socket: socket.id
+      });
+
+      console.log('call user');
+
+    });
+    
+    socket.on("make-answer", data => {
+      socket.to(data.to).emit("answer-made", {
+        socket: socket.id,
+        answer: data.answer
+      });
+
+      console.log('make answer');
+
+    });
+
+
+
+
+
 });
+
+

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import WebMidi from "webmidi";
 import SocketContext from '../context/socket-context.js'
-
+const { RTCPeerConnection, RTCSessionDescription } = window;
 
 class HostSynth extends Component {
     constructor(props){
@@ -12,7 +12,9 @@ class HostSynth extends Component {
         inputs: [],
         outputs: [],
         conToSynth: false,
-        currentRoom: null
+        currentRoom: null,
+        peerConnection: new RTCPeerConnection(),
+        isAlreadyCalling: false
       };
     }
 
@@ -20,7 +22,56 @@ class HostSynth extends Component {
         WebMidi.enable( (err) => {
             console.log(WebMidi.inputs);
             console.log(WebMidi.outputs); 
-        }, true);   
+        }, true);
+
+
+
+        const asdasd = new RTCPeerConnection();
+        this.setState({peerConnection: asdasd});
+
+        navigator.getUserMedia(
+            { video: true, audio: true },
+            stream => {
+              const localVideo = document.getElementById("local-video");
+              if (localVideo) {
+                localVideo.srcObject = stream;
+              }
+
+              stream.getTracks().forEach(track => this.state.peerConnection.addTrack(track, stream));
+              //suss on that one
+            },
+            error => {
+              console.warn(error.message);
+            }
+           );
+
+
+            this.props.socket.on('initiate-video', (data) => {
+                console.log(data);
+                this.callUser(data);
+            });
+
+            // callUser(socketId);
+
+           this.props.socket.on("answer-made", async data => {
+               console.log('answer made');
+            await this.state.peerConnection.setRemoteDescription(
+                new RTCSessionDescription(data.answer)
+            );
+            
+            if (!this.state.isAlreadyCalling) {
+                this.callUser(data.socket);
+                this.setState({isAlreadyCalling: true});
+            }
+        });
+
+        this.state.peerConnection.ontrack = function({ streams: [stream] }) {
+            const remoteVideo = document.getElementById("remote-video");
+            if (remoteVideo) {
+            remoteVideo.srcObject = stream;
+            }
+       };
+
     }
     
     componentWillUnmount() {
@@ -107,13 +158,26 @@ class HostSynth extends Component {
     };
 
 
+        async callUser(socketId) {
+        const offer = await this.state.peerConnection.createOffer();
+        await this.state.peerConnection.setLocalDescription(new RTCSessionDescription(offer));
+        
+        this.props.socket.emit("call-user", {
+            offer,
+            to: socketId
+        });
+
+        console.log(offer);
+
+
+       }
+
+       
+
     render() {
+
         const { statusArr } = this.state;
-        const sliderStyle = {
-            width: "150px",
-            height: "10px",
-            display: "inline-block"
-        };
+
 
         return (
             <div className="container-fluid pb-3">
@@ -132,9 +196,14 @@ class HostSynth extends Component {
                         <div key={index} style={index === this.state.highlightedParam ? {color:'red'} : {}}>
                         {index} : {param}
 
-                        </div>
+                    </div>
 
                     ))}
+                </div>
+
+                <div className="video-container">
+                    <video autoPlay className="remote-video" id="remote-video"></video>
+                    <video autoPlay muted className="local-video" id="local-video"></video>
                 </div>
 
             </div>
