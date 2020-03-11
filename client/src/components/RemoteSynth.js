@@ -3,6 +3,9 @@ import WebMidi from "webmidi";
 import SocketContext from '../context/socket-context.js'
 
 import Slider from '@material-ui/core/Slider';
+import Dropdown from 'rc-dropdown';
+import Menu, { Item as MenuItem, Divider } from 'rc-menu';
+import 'rc-dropdown/assets/index.css';
 
 class RemoteSynth extends Component {
     constructor(props){
@@ -14,7 +17,8 @@ class RemoteSynth extends Component {
         outputs: [],
         conToHost: false,
         value: 50,
-        currentRoom: this.props.currentRoom
+        currentRoom: this.props.currentRoom,
+        viewColumns: 1
       };
     }
     
@@ -58,26 +62,26 @@ class RemoteSynth extends Component {
     }
 
     requestRandomPatch = () => {
-
+        this.props.socket.emit('Func', {room: this.state.currentRoom, msg: `Random`});
     }
 
 
     // adjust all notes
-    recieveStatus = () => {
+    // recieveStatus = () => {
         
-        var input = WebMidi.getInputByName("UM-1");
-        input.addListener('controlchange', "all", (e) => {
-        //   console.log("Received 'controlchange' message.", e);
-        //   console.log(e.controller.number);
-        //   console.log(e.value);
+    //     var input = WebMidi.getInputByName("UM-1");
+    //     input.addListener('controlchange', "all", (e) => {
+    //     //   console.log("Received 'controlchange' message.", e);
+    //     //   console.log(e.controller.number);
+    //     //   console.log(e.value);
             
-        this.updateOneParam(e.controller.number, e.value);
-        this.handleSliderChange(e.controller.number, e.value)
+    //     this.updateOneParam(e.controller.number, e.value);
+    //     this.handleSliderChange(e.controller.number, e.value)
             
-        });
-        this.setState({conToSynth: true});
-        this.addHost();
-    }
+    //     });
+    //     this.setState({conToSynth: true});
+    //     this.addHost();
+    // }
 
     updateOneParam(i, v){
         
@@ -89,72 +93,59 @@ class RemoteSynth extends Component {
         this.setState({statusArr: newArr, highlightedParam: i});
     };
 
-    // handleSliderChange(i, e) {
-    //     if (typeof e === 'number') {
-    //         let target = document.querySelectorAll('.MuiSlider-root')[i];
-    //         let thumb = document.querySelectorAll('.MuiSlider-thumb')[i];
-    //         let input = target.querySelector('input');
-    //         let track = target.querySelector('.MuiSlider-track');
-    //         let label = target.querySelector('.PrivateValueLabel-label-25');
-    //         input.value = Math.round(e);
-    //         thumb.style.left = `${Math.round(e) / 1.27}%`;
-    //         thumb.setAttribute('aria-valuenow', Math.round(e));
-    //         track.style.width = `${Math.round(e) / 1.27}%`;
-    //         label.textContent = Math.round(e);
-    //     } else {
-    //         let value = e.target.getAttribute('aria-valuenow');
-           
-
-    //         if (value) {
-    //             let rv = Math.round(value);
-    //             const newArr = this.state.statusArr;
-
-    //             newArr[i] = rv;
-    //             this.setState({statusArr: newArr});
-
-    //             this.props.socket.emit('CC', {room: this.state.currentRoom, msg: { param: i, value: rv}});
-
-    //         }
-    //     }
-    // };
-
-
 
     handleSliderChange = (event, newValue) => {
         
         if (event.target.classList.contains("MuiSlider-thumb")) {
             if (event.target.parentNode.dataset.slider) {
                 this.updateOneParam(parseInt(event.target.parentNode.dataset.slider), newValue);
-                // console.log(event.target.parentNode.dataset.slider);
-                // console.log(newValue);
-                // console.log('option 1');
             }
         } else {
             if (event.target.dataset.slider) {
                 this.updateOneParam(parseInt(event.target.dataset.slider), newValue);
-                // console.log(event.target.dataset.slider);
-                // console.log(newValue);
-                // console.log('option 2');
             }
         }
     };
 
+    onColumnSelect = ({key}) => {
+        this.setState({viewColumns: key});
+      }
+
     render() {
-  
 
-          const sliderStyle = {
+        const columnMenu = (
+            <Menu onSelect={this.onColumnSelect}>
+              <MenuItem key="1">1</MenuItem>
+              <MenuItem key="2">2</MenuItem>
+              <MenuItem key="3">3</MenuItem>
+              <MenuItem key="4">4</MenuItem>
+              <MenuItem key="5">5</MenuItem>
+              <MenuItem key="6">6</MenuItem>
+            </Menu>
+        );
 
-            display: "inline-block"
-          };
+        const sliderStyle = {
+            display: "inline-block",
+            color: "white"
+        };
 
         const { statusArr } = this.state;
         return (
             <div className="container-fluid pb-3">
                 <div className="row justify-content-md-center">
                 
-                <button onClick={this.requestRandomPatch}>Request Random Patch</button>
+                    <button className="synthToolButton" onClick={this.requestRandomPatch}>Request Random Patch</button>
 
-                <div style={{ columnCount:4}}>
+                    <Dropdown
+                        trigger={['click']}
+                        overlay={columnMenu}
+                        animation="slide-up"
+                        onVisibleChange={this.onVisibleChange}
+                    >
+                        <button className="synthToolButton" style={{ float: 'right' }}>Columns</button>
+                    </Dropdown>
+
+                    <div style={{ columnCount: this.state.viewColumns}}>
                 
                     {statusArr.length <= 0
                     ? <div className="status-div">Loading params...</div>

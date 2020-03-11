@@ -15,10 +15,8 @@ class Join extends Component {
    }
   
    componentDidMount() {
-    // console.log(this.props.socket); 
-    // this.props.socket.on("hosts", data => this.setState({ hostsArr: data }));
 
-        console.log(this.props.socket.id); // an alphanumeric id...
+        console.log(this.props.socket.id);
 
         this.props.socket.emit('getHosts', 'kanichiwa');
         console.log('emitting getHosts message');
@@ -27,44 +25,37 @@ class Join extends Component {
             console.log('Incoming message:', data);
             this.setState({ hostsArr: data })
         });
-
     }
 
 
     connectToRoom = (roomName) => {
       console.log('Connecting to... ' + roomName);
       this.props.socket.emit('joinRoom', roomName);
-      this.setState({currentRoom: roomName})
-
-      
+      this.setState({currentRoom: roomName})     
     }
-
-
-
-
 
     render() {
   
       if(this.state.currentRoom === null) {
         return (
           
-              <div>
+              <div className="content">
                 Join page
 
                 {this.state.hostsArr.length <= 0
                     ? <p>No synth hosts available right now...</p>
                     : this.state.hostsArr.map((host, index) => ( <p key={index+host.hostSocket}>
-                      Host Available: {index} : {host.hostSocket}: {host.room} : {host.userCount} : <button onClick={() => this.connectToRoom(host.room)}>Join</button>
+                      Host Available: <br></br>
+                      {host.room} - Users: {host.userCount} : <button className="synthToolButton" onClick={() => this.connectToRoom(host.room)}>Join</button>
                     </p> ))}
                     
-                    <div>Not connected to Host Synth</div>
 
               </div>
               );
 
           } else {
         return (
-            <div>
+            <div className="content">
               <div>Connected to Host</div>
               <RemoteSynth currentRoom={this.state.currentRoom} />
             </div>

@@ -1,8 +1,71 @@
 body, a, p, div {
   background-color: black;
   color: rgb(206, 206, 206);
-  
+  font-family: 'Source Code Pro', monospace;
 }
+
+.header {
+  margin-left: 10%;
+  margin-right: 10%;
+  margin-top: 2%;
+}
+
+.content {
+  margin-left: 10%;
+  margin-right: 10%;
+  margin-top: 2%;
+}
+.headerLogo {
+ position: absolute;
+ left: 50%;
+ transform: translate(-50%);
+ display: inline-block;
+}
+
+/* .headerContent {
+  display: inline-block;
+  
+} */
+
+
+
+@media (max-width: 600px) {
+  .headerLogo {
+    display: none;
+  }
+
+
+}
+
+.synthToolbox {
+  margin-top: 1%;
+  margin-bottom: 1%;
+}
+
+.synthToolButton {
+
+  color: rgb(206, 206, 206);
+  background-color: black;
+  
+  padding: 10px;
+  margin: 10px;
+  /* border: 1px solid white;
+  border-radius: 5px;
+  box-shadow: 3px 3px white; */
+  border-radius: 3px;
+  box-shadow: 0 1px 5px #ccc;
+  background-clip: padding-box;
+  border: 1px solid #ccc;
+}
+
+
+.synthToolButton:hover {
+  /* background-color: darkred;  */
+  color: aquamarine;
+  /* background-color: white; */
+  /* border: 1px solid black; */
+}
+
 
 .App {
   text-align: center;

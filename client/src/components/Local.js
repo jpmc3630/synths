@@ -17,7 +17,7 @@ class Local extends Component {
   
       return (
         
-        <div>
+        <div className="content">
           Local Mode
 
         <LocalSynth />

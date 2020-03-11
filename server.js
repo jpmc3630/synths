@@ -87,7 +87,11 @@ io.sockets.on('connection', function(socket) {
       console.log(data);
       io.sockets.in(data.room).emit('CC', data.msg);
     });
-
+    socket.on('Func', function(data) {
+      console.log('passing Func message:');
+      console.log(data);
+      io.sockets.in(data.room).emit('Func', data.msg);
+    });
 
     // join room, for joiners
     socket.on('joinRoom', function(roomName) {

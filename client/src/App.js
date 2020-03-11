@@ -28,17 +28,6 @@ class App extends Component {
     };
   }
 
-  componentDidMount() {
-    // const { endpoint } = this.state;
-    // const socket = socketIOClient(endpoint);
-    // socket.on("FromAPI", data => this.setState({ response: data }));
-    
-  }
-
-
-
-
-
 
   render() {
 
@@ -49,26 +38,21 @@ class App extends Component {
       <SocketContext.Provider value={socket}>
      
         <Router>
-          <div>
+          <div className="header">
+            
 
-            <button onClick={this.sendMSG}>test</button>
-
-            <ul>
-            <li>
-                <Link to="/local">Local Mode</Link>
-              </li>
-              <li>
-                <Link to="/host">Host Synth</Link>
-              </li>
-              <li>
-                <Link to="/join">Join Synth</Link>
-              </li>
-            </ul>
-
-            <hr />
-
-
-
+              <hr />
+              <div className="headerContent">
+                  <div className="headerLogo">- synths - </div>
+              
+                  <Link to="/local">LOCAL</Link>&nbsp;&nbsp;
+                  <Link to="/host">HOST</Link>&nbsp;&nbsp;
+                  <Link to="/join">JOIN</Link>&nbsp;&nbsp;
+              </div>
+              <hr />
+            
+          </div>
+          
             <Switch>
               <Route exact path="/local">
                 <Local />
@@ -80,7 +64,7 @@ class App extends Component {
                 <Join />
               </Route>
             </Switch>
-          </div>
+          
         </Router>
     
       </SocketContext.Provider>

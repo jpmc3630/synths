@@ -17,7 +17,7 @@ class Host extends Component {
   
       return (
         
-        <div>
+        <div className="content">
           Hosting page
 
         <HostSynth />
