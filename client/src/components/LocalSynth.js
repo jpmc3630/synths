@@ -68,7 +68,7 @@ class LocalSynth extends Component {
     randomPatch = () => {
         let newStatusArr = [];
         //120 for all CC params
-        for (let i = 0 ; i < 75; i++) {
+        for (let i = 0 ; i < 96; i++) {
             let rndNum = this.rndVal();
             
             // set the synth
@@ -92,7 +92,7 @@ class LocalSynth extends Component {
           console.log(e.value);
             
         this.updateOneParam(e.controller.number, e.value);
-       
+        this.setState({conToSynth: true});
         });
     }
 
@@ -126,8 +126,13 @@ class LocalSynth extends Component {
         }
     };
 
-    loadPatch = () => {
-        let patchArr = [30,30,31,102,27,108,83,127,48,35,56,105,23,20,127,6,0,30,64,64,87,44,0,6,106,110,28,3,93,94,6,2,32,50,105,100,127,90,28,52,69,95,72,54,89,85,21,39,77,35,30,22,62,70,8,1,20,65,5,92,80,17,95,87,105,98,5,23,57,110,124,31,29,20,13,127];
+    loadPatch = (num) => {
+        let patchArr = [];
+        if (num === 1) patchArr = [102, 48, 119, 94, 31, 56, 46, 69, 108, 52, 96, 67, 88, 77, 83, 126, 85, 56, 55, 31, 69, 113, 44, 75, 48, 11, 2, 62, 42, 35, 106, 30, 68, 60, 27, 1, 12, 78, 63, 40, 41, 78, 28, 90, 1, 7, 19, 117, 108, 57, 19, 0, 16, 19, 86, 64, 23, 19, 52, 121, 113, 111, 1, 100, 22, 70, 51, 12, 7, 103, 3, 99, 62, 10, 48, 31, 65, 9, 100, 28, 111, 123, 93, 3, 72, 121, 67, 103, 25, 26, 87, 42, 5, 39, 33, 7];
+        if (num === 2) patchArr = [80, 3, 0, 107, 89, 108, 13, 90, 20, 61, 54, 74, 40, 110, 48, 38, 36, 39, 106, 38, 70, 116, 62, 108, 92, 79, 46, 14, 102, 19, 52, 61, 119, 104, 79, 72, 115, 104, 29, 54, 88, 74, 21, 90, 74, 40, 44, 32, 36, 101, 117, 126, 93, 76, 26, 55, 86, 116, 127, 119, 77, 22, 28, 78, 2, 122, 96, 119, 86, 39, 95, 37, 66, 105, 8, 30, 45, 82, 116, 96, 91, 106, 55, 87, 3, 76, 115, 27, 3, 35, 67, 71, 51, 18, 64, 87];
+        if (num === 3) patchArr = [55, 0, 110, 18, 3, 0, 83, 127, 121, 41, 60, 59, 0, 3, 0, 81, 18, 125, 59, 61, 127, 127, 0, 116, 60, 28, 61, 60, 61, 66, 66, 22, 115, 52, 114, 4, 90, 10, 45, 98, 62, 24, 111, 19, 113, 48, 38, 81, 59, 71, 8, 109, 8, 28, 79, 0, 84, 96, 51, 7, 85, 78, 101, 36, 23, 75, 38, 57, 15, 124, 90, 76, 61, 64, 45, 82, 0, 38, 54, 72, 81, 95, 74, 56, 80, 64, 88, 57, 15, 49, 60, 68, 48, 62, 65, 74];
+        // [30,30,31,102,27,108,83,127,48,35,56,105,23,20,127,6,0,30,64,64,87,44,0,6,106,110,28,3,93,94,6,2,32,50,105,100,127,90,28,52,69,95,72,54,89,85,21,39,77,35,30,22,62,70,8,1,20,65,5,92,80,17,95,87,105,98,5,23,57,110,124,31,29,20,13,127];
+        
         this.setState({statusArr: patchArr});
         for (let i = 0; i < patchArr.length; i++) {
             this.updateOneParam(i, patchArr[i]);
@@ -140,7 +145,111 @@ class LocalSynth extends Component {
 
 
     render() {
-  
+        
+        const namesArr = [
+            0,
+            'Mod Wheel',
+            2,
+            3,
+            'Pitch Bend',
+            'Portamento',
+            6,
+            'Amp Level',
+            8,
+            9,
+            'Pan Pot',
+            11,
+            'ModFX LFO Speed',
+            'DelayFX Time',
+            'OSC1 Control1',
+            'OSC1 Control2',
+            16,
+            17,
+            'OSC2 Semitone',
+            'OSC2 Tune',
+            'OSC1 Level',
+            'OSC 2 Level',
+            'Noise Level',
+            'EG1 Attack',
+            'EG1 Decay',
+            'EG1 Sustain',
+            'EG1 Release',
+            'LFO1 Freq',
+            'Patch 1',
+            'Patch 2',
+            'Patch 3',
+            'Patch 4',
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            'EG2 Sustain',
+            'Filter Res',
+            'EG2 Release',
+            'EG2 Attack',
+            'Filter Cutoff',
+            'EG2 Decay',
+            'LFO2 Freq',
+            'OSC1 Wave',
+            'OSC2 Wave',
+            'EG1 Int',
+            80,
+            81,
+            'OSC2 Mod',
+            'Filter type',
+            84,
+            'Kbd Track',
+            'EG2/Gate',
+            'LFO1 Wave',
+            'LFO2 Wave',
+            'Seq On/Off',
+            90,
+            91,
+            'Distortion',
+            'ModFX Depth',
+            'DelayFX Depth',
+            'Timbre Select',
+            96,
+            97,
+            98,
+            99,
+            100
+        ]
+
         const columnMenu = (
             <Menu onSelect={this.onColumnSelect}>
               <MenuItem key="1">1</MenuItem>
@@ -173,11 +282,13 @@ class LocalSynth extends Component {
                 <div className="row justify-content-md-center">
                     <div className="synthToolbox">
                         {this.state.conToSynth 
-                        ? <div>Connected to Synth<button className="synthToolButton" onClick={this.randomPatch}>Randomize Patch</button></div>
+                        ? <div>Connected to Synth</div>
                         : <button className="synthToolButton" onClick={() => {this.recieveCC(); this.randomPatch();}}>Connect to Synth</button>}
-
-                        <button className="synthToolButton" onClick={this.loadPatch}>Load Preset 1</button>
-                        
+                        <button className="synthToolButton" onClick={this.randomPatch}>Randomise Patch</button>
+                        <button className="synthToolButton" onClick={() => {console.log(this.state.statusArr)}}>Log Patch</button>
+                        <button className="synthToolButton" onClick={() => {this.loadPatch(1);}}>1</button>
+                        <button className="synthToolButton" onClick={() => {this.loadPatch(2);}}>2</button>
+                        <button className="synthToolButton" onClick={() => {this.loadPatch(3);}}>3</button>
                         <Dropdown
                             trigger={['click']}
                             overlay={columnMenu}
@@ -206,12 +317,13 @@ class LocalSynth extends Component {
 
 
                         {statusArr.length <= 0
-                        ? <div className="status-div">Loading params</div>
+                        ? <div className="status-div">Not connected to synth</div>
                         : statusArr.map((param, index) => (
-                            
+                            <div>{typeof namesArr[index] === 'number' ? <div></div> : 
                         <div key={index} style={index === this.state.highlightedParam ? {color:'red'} : {}}>
                             
-                            {index} : {param}
+                            
+                            {namesArr[index]} : {param}
                 
                             <Slider
                                     value={this.state.statusArr[index]}
@@ -223,9 +335,9 @@ class LocalSynth extends Component {
                                     color={'secondary'} 
                                     style={sliderStyle}
                             />
-
                         </div>
-
+                        
+                    }</div>
 
                         ))}
                     </div>
