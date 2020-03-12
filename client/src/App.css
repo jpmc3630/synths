@@ -14,6 +14,7 @@ body, a, p, div {
   margin-left: 10%;
   margin-right: 10%;
   margin-top: 2%;
+  overflow: hidden;
 }
 .headerLogo {
  position: absolute;
@@ -33,8 +34,30 @@ body, a, p, div {
   .headerLogo {
     display: none;
   }
+}
 
+.remote-video {
+  position: absolute;
+  /* padding: 10px; */
+  margin: 10px;
+  border-radius: 7px;
+  box-shadow: 0 1px 7px #ccc;
+  background-clip: padding-box;
+  border: 3px solid #ccc;
+  left:50%;
+  transform: translate(-50%);
+}
 
+.local-video {
+  position: absolute;
+  /* padding: 10px; */
+  margin: 10px;
+  border-radius: 7px;
+  box-shadow: 0 1px 7px #ccc;
+  background-clip: padding-box;
+  border: 3px solid #ccc;
+  left:50%;
+  transform: translate(-50%);
 }
 
 .synthToolbox {
@@ -61,13 +84,13 @@ body, a, p, div {
 
 .synthToolButton:hover {
   /* background-color: darkred;  */
-  color: aquamarine;
+  color: rgb(156, 0, 0);;
   /* background-color: white; */
   /* border: 1px solid black; */
 }
 
 
-.App {
+/* .App {
   text-align: center;
 }
 
@@ -90,5 +113,27 @@ body, a, p, div {
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+} */
+
+.keys-container {
+  height: 120px;
+  width: 95%;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top:10px;
+  margin-bottom: 20px;
+ 
 }
 
+@media (max-width: 1000px) {
+
+  .keys-container {
+    position: relative;
+    height: 120px;
+    width: 1000px;
+    
+    margin-top:10px;
+    margin-bottom: 20px;
+    
+  }
+}

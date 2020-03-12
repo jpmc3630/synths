@@ -202,7 +202,7 @@ class HostSynth extends Component {
                 </div>
 
                 <div className="video-container">
-                    <video autoPlay className="remote-video" id="remote-video"></video>
+                    {/* <video autoPlay className="remote-video" id="remote-video"></video> */}
                     <video autoPlay muted className="local-video" id="local-video"></video>
                 </div>
 

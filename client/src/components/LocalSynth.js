@@ -1,11 +1,16 @@
 import React, { Component } from "react";
 import WebMidi from "webmidi";
 import SocketContext from '../context/socket-context.js'
+// import Keys from "./Keys"
+
 
 import Slider from '@material-ui/core/Slider';
 import Dropdown from 'rc-dropdown';
 import Menu, { Item as MenuItem, Divider } from 'rc-menu';
 import 'rc-dropdown/assets/index.css';
+
+import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
+import 'react-piano/dist/styles.css';
 
 class LocalSynth extends Component {
     constructor(props){
@@ -43,6 +48,16 @@ class LocalSynth extends Component {
     CC = (cc, value) => {
         let output = WebMidi.getOutputByName("UM-1");
         output.sendControlChange(cc, value);
+    }
+
+    playNoteToSynth = (note) => {
+        let output = WebMidi.getOutputByName("UM-1");
+        output.playNote(note);
+    }
+    
+    stopNoteToSynth = (note) => {
+        let output = WebMidi.getOutputByName("UM-1");
+        output.stopNote(note);
     }
 
     rndVal = () => {
@@ -142,8 +157,18 @@ class LocalSynth extends Component {
             color: "gray"
         };
 
+
+        const firstNote = MidiNumbers.fromNote('c2');
+        const lastNote = MidiNumbers.fromNote('f4');
+        const keyboardShortcuts = KeyboardShortcuts.create({
+          firstNote: firstNote,
+          lastNote: lastNote,
+          keyboardConfig: KeyboardShortcuts.HOME_ROW,
+        });
+
         const { statusArr } = this.state;
         return (
+            
             <div className="container-fluid pb-3">
                 <div className="row justify-content-md-center">
                     <div className="synthToolbox">
@@ -159,32 +184,47 @@ class LocalSynth extends Component {
                             animation="slide-up"
                             onVisibleChange={this.onVisibleChange}
                         >
-                            <button className="synthToolButton" style={{textAlign:'right', position:'relative' }}>Columns</button>
+                            <button className="synthToolButton">Columns</button>
                         </Dropdown>
                     </div>
 
-                    <div style={{ columnCount: this.state.viewColumns}}>
-                    
+                    <div className="keys-container">
+                        <Piano
+                            noteRange={{ first: firstNote, last: lastNote }}
+                            playNote={(midiNumber) => {
+                                this.playNoteToSynth(midiNumber)
+                            }}
+                            stopNote={(midiNumber) => {
+                                this.stopNoteToSynth(midiNumber)
+                            }}
+                            // width={1000}
+                            keyboardShortcuts={keyboardShortcuts}
+                        />
+                    </div>
+
+                    <div style={{ columnCount: this.state.viewColumns}}>                    
+
+
                         {statusArr.length <= 0
                         ? <div className="status-div">Loading params</div>
                         : statusArr.map((param, index) => (
                             
-                            <div key={index} style={index === this.state.highlightedParam ? {color:'red'} : {}}>
-                                
-                                {index} : {param}
-                    
-                                <Slider
-                                        value={this.state.statusArr[index]}
-                                        onChange={this.handleSliderChange}
-                                        aria-labelledby="input-slider"
-                                        data-slider={index} 
-                                        min={0} 
-                                        max={127} 
-                                        color={'secondary'} 
-                                        style={sliderStyle}
-                                />
+                        <div key={index} style={index === this.state.highlightedParam ? {color:'red'} : {}}>
+                            
+                            {index} : {param}
+                
+                            <Slider
+                                    value={this.state.statusArr[index]}
+                                    onChange={this.handleSliderChange}
+                                    aria-labelledby="input-slider"
+                                    data-slider={index} 
+                                    min={0} 
+                                    max={127} 
+                                    color={'secondary'} 
+                                    style={sliderStyle}
+                            />
 
-                            </div>
+                        </div>
 
 
                         ))}

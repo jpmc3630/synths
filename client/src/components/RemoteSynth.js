@@ -67,7 +67,7 @@ class RemoteSynth extends Component {
             remoteVideo.srcObject = stream;
             }
        };
-       
+
         console.log('sending initiate video to room');
            console.log(this.state.currentRoom);
         this.props.socket.emit('initiate-video', {room: this.state.currentRoom, msg: this.props.socket.id});
@@ -191,7 +191,7 @@ class RemoteSynth extends Component {
                     {statusArr.length <= 0
                     ? <div className="status-div">Loading params...</div>
                     : statusArr.map((param, index) => (
-                        <div key={index} style={index === this.state.highlightedParam ? {color:'red'} : {color:'black'}}>
+                        <div key={index} style={index === this.state.highlightedParam ? {color:'red'} : {color:'white'}}>
                             
                             {index} : {param}
                 
@@ -213,7 +213,7 @@ class RemoteSynth extends Component {
 
                 <div className="video-container">
                     <video autoPlay className="remote-video" id="remote-video"></video>
-                    <video autoPlay muted className="local-video" id="local-video"></video>
+                    {/* <video autoPlay muted className="local-video" id="local-video"></video> */}
                 </div>
 
             </div>
