@@ -34,11 +34,20 @@ body, a, p, div {
   .headerLogo {
     display: none;
   }
+
+  .remove-video {
+    width: 100%;
+  }
+
+  .local-video {
+    width: 100%;
+  }
 }
 
 .remote-video {
   position: absolute;
-  /* padding: 10px; */
+  width: 400px;
+
   margin: 10px;
   border-radius: 7px;
   box-shadow: 0 1px 7px #ccc;
@@ -50,7 +59,9 @@ body, a, p, div {
 
 .local-video {
   position: absolute;
-  /* padding: 10px; */
+  
+  width: 400px;
+
   margin: 10px;
   border-radius: 7px;
   box-shadow: 0 1px 7px #ccc;

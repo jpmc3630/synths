@@ -6,6 +6,10 @@ import Slider from '@material-ui/core/Slider';
 import Dropdown from 'rc-dropdown';
 import Menu, { Item as MenuItem, Divider } from 'rc-menu';
 import 'rc-dropdown/assets/index.css';
+
+import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
+import 'react-piano/dist/styles.css';
+
 const { RTCPeerConnection, RTCSessionDescription } = window;
 
 class RemoteSynth extends Component {
@@ -24,13 +28,7 @@ class RemoteSynth extends Component {
       };
     }
     
-
     componentDidMount() {
-
-        
-        
-        // const asdasd = new RTCPeerConnection();
-        // this.setState({peerConnection: asdasd});
 
         // listner for socketIO data for statusArr
         this.props.socket.on('status', data => {
@@ -39,10 +37,10 @@ class RemoteSynth extends Component {
             this.setState({ statusArr: data })
         });
 
+        // will use for input midi device ie. input keyboard
         // WebMidi.enable( (err) => {
         //     console.log(WebMidi.inputs);
         //     console.log(WebMidi.outputs);
-            
         // }, true);   
 
         this.requestStatusArr();
@@ -125,6 +123,13 @@ class RemoteSynth extends Component {
         this.setState({statusArr: newArr, highlightedParam: i});
     };
 
+    playNoteToSocket = (note) => {
+        this.props.socket.emit('Note', {room: this.state.currentRoom, msg: { note: note, type: 'on'}});
+    }
+    
+    stopNoteToSocket = (note) => {
+        this.props.socket.emit('Note', {room: this.state.currentRoom, msg: { note: note, type: 'off'}});
+    }
 
     handleSliderChange = (event, newValue) => {
         
@@ -169,6 +174,13 @@ class RemoteSynth extends Component {
             color: "white"
         };
 
+        const firstNote = MidiNumbers.fromNote('c2');
+        const lastNote = MidiNumbers.fromNote('f4');
+        const keyboardShortcuts = KeyboardShortcuts.create({
+          firstNote: firstNote,
+          lastNote: lastNote,
+          keyboardConfig: KeyboardShortcuts.HOME_ROW,
+        });
         
         const { statusArr } = this.state;
         return (
@@ -185,6 +197,20 @@ class RemoteSynth extends Component {
                     >
                         <button className="synthToolButton" style={{ float: 'right' }}>Columns</button>
                     </Dropdown>
+
+                    <div className="keys-container">
+                        <Piano
+                            noteRange={{ first: firstNote, last: lastNote }}
+                            playNote={(midiNumber) => {
+                                this.playNoteToSocket(midiNumber)
+                            }}
+                            stopNote={(midiNumber) => {
+                                this.stopNoteToSocket(midiNumber)
+                            }}
+                            // width={1000}
+                            keyboardShortcuts={keyboardShortcuts}
+                        />
+                    </div>
 
                     <div style={{ columnCount: this.state.viewColumns}}>
                 

@@ -82,6 +82,11 @@ io.sockets.on('connection', function(socket) {
       console.log(data);
       io.sockets.in(data.room).emit('status', data.msg);
     });
+    socket.on('Note', function(data) {
+      console.log('passing Note message:');
+      console.log(data);
+      io.sockets.in(data.room).emit('Note', data.msg);
+    });
     socket.on('CC', function(data) {
       console.log('passing CC message:');
       console.log(data);

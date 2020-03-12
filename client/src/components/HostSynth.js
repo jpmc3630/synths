@@ -25,7 +25,6 @@ class HostSynth extends Component {
         }, true);
 
 
-
         const asdasd = new RTCPeerConnection();
         this.setState({peerConnection: asdasd});
 
@@ -43,18 +42,17 @@ class HostSynth extends Component {
             error => {
               console.warn(error.message);
             }
-           );
+        );
 
 
-            this.props.socket.on('initiate-video', (data) => {
-                console.log(data);
-                this.callUser(data);
-            });
+        this.props.socket.on('initiate-video', (data) => {
+            console.log(data);
+            this.callUser(data);
+        });
 
-            // callUser(socketId);
 
-           this.props.socket.on("answer-made", async data => {
-               console.log('answer made');
+        this.props.socket.on("answer-made", async data => {
+            console.log('answer made');
             await this.state.peerConnection.setRemoteDescription(
                 new RTCSessionDescription(data.answer)
             );
@@ -92,6 +90,16 @@ class HostSynth extends Component {
             }
         });
 
+        this.props.socket.on('Note', (data) => {
+            console.log('recieved Note message:');
+            console.log(data);
+            if (data.type === 'on') {
+                this.playNoteToSynth(data.note);
+            } else {
+                this.stopNoteToSynth(data.note);
+            };
+          });
+
         this.props.socket.on('CC', (data) => {
             console.log('recieved CC message:');
             console.log(data);
@@ -104,6 +112,16 @@ class HostSynth extends Component {
             }
         });
 
+    }
+    
+    playNoteToSynth = (note) => {
+        let output = WebMidi.getOutputByName("UM-1");
+        output.playNote(note);
+    }
+    
+    stopNoteToSynth = (note) => {
+        let output = WebMidi.getOutputByName("UM-1");
+        output.stopNote(note);
     }
 
     sendStatusArr = () => {

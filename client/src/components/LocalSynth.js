@@ -12,6 +12,7 @@ import 'rc-dropdown/assets/index.css';
 import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
 import 'react-piano/dist/styles.css';
 
+
 class LocalSynth extends Component {
     constructor(props){
       super(props);
@@ -25,7 +26,6 @@ class LocalSynth extends Component {
         viewColumns: 1
       };
     }
-
 
     componentDidMount() {
         WebMidi.enable( (err) => {
