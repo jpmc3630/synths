@@ -3,6 +3,7 @@ import WebMidi from "webmidi";
 import SocketContext from '../context/socket-context.js'
 const { RTCPeerConnection, RTCSessionDescription } = window;
 
+
 class HostSynth extends Component {
     constructor(props){
       super(props);
@@ -13,7 +14,7 @@ class HostSynth extends Component {
         outputs: [],
         conToSynth: false,
         currentRoom: null,
-        peerConnection: null,
+        peerConnection: new RTCPeerConnection({ 'iceServers': [{ 'urls': 'stun:74.125.142.127:19302' }] }),
         isAlreadyCalling: false
       };
     }
@@ -26,9 +27,9 @@ class HostSynth extends Component {
 
         
 //var  _iceServers = [{ url: 'stun:74.125.142.127:19302' }], // stun.l.google.com - Firefox does not support DNS names.
-        var servers = { 'iceServers': [{ 'urls': 'stun:74.125.142.127:19302' }] };
-        const connection = new RTCPeerConnection(servers);
-        this.setState({peerConnection: connection});
+
+        // const connection = new RTCPeerConnection(servers);
+        // this.setState({peerConnection: connection});
 
         navigator.getUserMedia(
             { video: true, audio: true },
