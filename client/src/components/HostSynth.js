@@ -13,7 +13,7 @@ class HostSynth extends Component {
         outputs: [],
         conToSynth: false,
         currentRoom: null,
-        peerConnection: new RTCPeerConnection(),
+        peerConnection: null,
         isAlreadyCalling: false
       };
     }
@@ -24,9 +24,11 @@ class HostSynth extends Component {
             console.log(WebMidi.outputs); 
         }, true);
 
-
-        const asdasd = new RTCPeerConnection();
-        this.setState({peerConnection: asdasd});
+        
+//var  _iceServers = [{ url: 'stun:74.125.142.127:19302' }], // stun.l.google.com - Firefox does not support DNS names.
+        var servers = { 'iceServers': [{ 'urls': 'stun:74.125.142.127:19302' }] };
+        const connection = new RTCPeerConnection(servers);
+        this.setState({peerConnection: connection});
 
         navigator.getUserMedia(
             { video: true, audio: true },

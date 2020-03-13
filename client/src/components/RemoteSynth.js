@@ -24,11 +24,16 @@ class RemoteSynth extends Component {
         value: 50,
         currentRoom: this.props.currentRoom,
         viewColumns: 1,
-        peerConnection: new RTCPeerConnection()
+        peerConnection: null
       };
     }
     
     componentDidMount() {
+
+        //var  _iceServers = [{ url: 'stun:74.125.142.127:19302' }], // stun.l.google.com - Firefox does not support DNS names.
+        var servers = { 'iceServers': [{ 'urls': 'stun:74.125.142.127:19302' }] };
+        const connection = new RTCPeerConnection(servers);
+        this.setState({peerConnection: connection});
 
         // listner for socketIO data for statusArr
         this.props.socket.on('status', data => {
@@ -156,7 +161,114 @@ class RemoteSynth extends Component {
 
       }
 
+
+      
+
     render() {
+
+        const namesArr = [
+            0,
+            'Mod Wheel',
+            2,
+            3,
+            'Pitch Bend',
+            'Portamento',
+            6,
+            'Amp Level',
+            8,
+            9,
+            'Pan Pot',
+            11,
+            'ModFX LFO Speed',
+            'DelayFX Time',
+            'OSC1 Control1',
+            'OSC1 Control2',
+            16,
+            17,
+            'OSC2 Semitone',
+            'OSC2 Tune',
+            'OSC1 Level',
+            'OSC 2 Level',
+            'Noise Level',
+            'EG1 Attack',
+            'EG1 Decay',
+            'EG1 Sustain',
+            'EG1 Release',
+            'LFO1 Freq',
+            'Patch 1',
+            'Patch 2',
+            'Patch 3',
+            'Patch 4',
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            'EG2 Sustain',
+            'Filter Res',
+            'EG2 Release',
+            'EG2 Attack',
+            'Filter Cutoff',
+            'EG2 Decay',
+            'LFO2 Freq',
+            'OSC1 Wave',
+            'OSC2 Wave',
+            'EG1 Int',
+            80,
+            81,
+            'OSC2 Mod',
+            'Filter type',
+            84,
+            'Kbd Track',
+            'EG2/Gate',
+            'LFO1 Wave',
+            'LFO2 Wave',
+            'Seq On/Off',
+            90,
+            91,
+            'Distortion',
+            'ModFX Depth',
+            'DelayFX Depth',
+            'Timbre Select',
+            96,
+            97,
+            98,
+            99,
+            100
+        ]
 
         const columnMenu = (
             <Menu onSelect={this.onColumnSelect}>
