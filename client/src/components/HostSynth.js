@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import WebMidi from "webmidi";
 import SocketContext from '../context/socket-context.js'
 const { RTCPeerConnection, RTCSessionDescription } = window;
-var servers = { 'iceServers': [{ 'urls': 'stun:74.125.142.127:19302' }] };
+var servers = { 'iceServers': [{ 'urls': 'stun.l.google.com:19302' }] };
 
 
 class HostSynth extends Component {

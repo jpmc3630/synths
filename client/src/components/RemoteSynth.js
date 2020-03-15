@@ -11,7 +11,7 @@ import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
 import 'react-piano/dist/styles.css';
 
 const { RTCPeerConnection, RTCSessionDescription } = window;
-var servers = { 'iceServers': [{ 'urls': 'stun:74.125.142.127:19302' }] };
+var servers = { 'iceServers': [{ 'urls': 'stun.l.google.com:19302' }] };
 
 class RemoteSynth extends Component {
     constructor(props){
