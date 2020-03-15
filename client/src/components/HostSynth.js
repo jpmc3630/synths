@@ -123,7 +123,7 @@ class HostSynth extends Component {
             this.setState({statusArr: patchArr});
             
             for (let i = 0; i < patchArr.length; i++) {
-                this.updateOneParam(i, patchArr[i]);
+                this.CC(i, patchArr[i]);
             }
             this.sendStatusArr();
         }
