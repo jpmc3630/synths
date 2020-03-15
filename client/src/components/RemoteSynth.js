@@ -4,7 +4,8 @@ import SocketContext from '../context/socket-context.js'
 
 import Slider from '@material-ui/core/Slider';
 import Dropdown from 'rc-dropdown';
-import Menu, { Item as MenuItem, Divider } from 'rc-menu';
+import Menu, { Item as MenuItem } from 'rc-menu';
+//divider is available for drop down menu as { Divider }
 import 'rc-dropdown/assets/index.css';
 
 import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
@@ -39,9 +40,7 @@ class RemoteSynth extends Component {
 
         // listner for socketIO data for statusArr
         this.props.socket.on('status', data => {
-            console.log('Recievy the status');
-            console.log('Incoming statusArr:', data);
-            this.setState({ statusArr: data })
+            this.setState({ statusArr: data, conToHost: true })
         });
 
         // will use for input midi device ie. input keyboard
@@ -102,23 +101,32 @@ class RemoteSynth extends Component {
         this.props.socket.emit('Func', {room: this.state.currentRoom, msg: `Random`});
     }
 
+    sendStatusArr = (patchArr) => {
+        this.props.socket.emit('sendConfig', {room: this.state.currentRoom, msg: patchArr});
+        console.log('send status');
+    }
 
-    // adjust all notes
-    // recieveStatus = () => {
-        
-    //     var input = WebMidi.getInputByName("UM-1");
-    //     input.addListener('controlchange', "all", (e) => {
-    //     //   console.log("Received 'controlchange' message.", e);
-    //     //   console.log(e.controller.number);
-    //     //   console.log(e.value);
-            
-    //     this.updateOneParam(e.controller.number, e.value);
-    //     this.handleSliderChange(e.controller.number, e.value)
-            
-    //     });
-    //     this.setState({conToSynth: true});
-    //     this.addHost();
-    // }
+    sendPatch = (num) => {
+        console.log('send patch');
+        let patchArr = [];
+        if (num === 1) patchArr = [102, 48, 119, 94, 31, 56, 46, 69, 108, 52, 96, 67, 88, 77, 83, 126, 85, 56, 55, 31, 69, 113, 44, 75, 48, 11, 2, 62, 42, 35, 106, 30, 68, 60, 27, 1, 12, 78, 63, 40, 41, 78, 28, 90, 1, 7, 19, 117, 108, 57, 19, 0, 16, 19, 86, 64, 23, 19, 52, 121, 113, 111, 1, 100, 22, 70, 51, 12, 7, 103, 3, 99, 62, 10, 48, 31, 65, 9, 100, 28, 111, 123, 93, 3, 72, 121, 67, 103, 25, 26, 87, 42, 5, 39, 33, 7];
+        if (num === 2) patchArr = [80, 3, 0, 107, 89, 108, 13, 90, 20, 61, 54, 74, 40, 110, 48, 38, 36, 39, 106, 38, 70, 116, 62, 108, 92, 79, 46, 14, 102, 19, 52, 61, 119, 104, 79, 72, 115, 104, 29, 54, 88, 74, 21, 90, 74, 40, 44, 32, 36, 101, 117, 126, 93, 76, 26, 55, 86, 116, 127, 119, 77, 22, 28, 78, 2, 122, 96, 119, 86, 39, 95, 37, 66, 105, 8, 30, 45, 82, 116, 96, 91, 106, 55, 87, 3, 76, 115, 27, 3, 35, 67, 71, 51, 18, 64, 87];
+        if (num === 3) patchArr = [55, 0, 110, 18, 3, 0, 83, 127, 121, 41, 60, 59, 0, 3, 0, 81, 18, 125, 59, 61, 127, 127, 0, 116, 60, 28, 61, 60, 61, 66, 66, 22, 115, 52, 114, 4, 90, 10, 45, 98, 62, 24, 111, 19, 113, 48, 38, 81, 59, 71, 8, 109, 8, 28, 79, 0, 84, 96, 51, 7, 85, 78, 101, 36, 23, 75, 38, 57, 15, 124, 90, 76, 61, 64, 45, 82, 0, 38, 54, 72, 81, 95, 74, 56, 80, 64, 88, 57, 15, 49, 60, 68, 48, 62, 65, 74];
+        this.sendStatusArr(patchArr);
+    }
+
+    sendRandom = () => {
+        let newStatusArr = [];
+        //120 for all CC params
+        for (let i = 0 ; i < 96; i++) {
+            let rndNum = this.rndVal();
+            // set srray
+            newStatusArr[i] = rndNum;
+        }
+        this.sendStatusArr(newStatusArr);
+    }
+
+    
 
     updateOneParam(i, v){
         
@@ -153,18 +161,9 @@ class RemoteSynth extends Component {
 
     onColumnSelect = ({key}) => {
         this.setState({viewColumns: key});
-
-        this.state.peerConnection.ontrack = function({ streams: [stream] }) {
-            const remoteVideo = document.getElementById("remote-video");
-            if (remoteVideo) {
-            remoteVideo.srcObject = stream;
-            }
-       };
-
       }
 
 
-      
 
     render() {
 
@@ -270,7 +269,7 @@ class RemoteSynth extends Component {
             98,
             99,
             100
-        ]
+        ];
 
         const columnMenu = (
             <Menu onSelect={this.onColumnSelect}>
@@ -298,19 +297,33 @@ class RemoteSynth extends Component {
         
         const { statusArr } = this.state;
         return (
-            <div className="container-fluid pb-3">
-                <div className="row justify-content-md-center">
-                
-                    <button className="synthToolButton" onClick={this.requestRandomPatch}>Request Random Patch</button>
 
-                    <Dropdown
-                        trigger={['click']}
-                        overlay={columnMenu}
-                        animation="slide-up"
-                        onVisibleChange={this.onVisibleChange}
-                    >
-                        <button className="synthToolButton" style={{ float: 'right' }}>Columns</button>
-                    </Dropdown>
+            <div className="container-fluid pb-3">
+            <div className="row justify-content-md-center">
+
+                {(this.state.conToHost === false)
+                ? <div>Failed to connect to host</div>
+                : 
+                <div>
+
+                    <div className="synthToolbox">
+                        
+                        <button className="synthToolButton" onClick={this.sendRandom}>Randomise Patch</button>
+                        <button className="synthToolButton" onClick={() => {console.log(this.state.statusArr)}}>Log Patch</button>
+                        <button className="synthToolButton" onClick={() => {this.sendPatch(1);}}>1</button>
+                        <button className="synthToolButton" onClick={() => {this.sendPatch(2);}}>2</button>
+                        <button className="synthToolButton" onClick={() => {this.sendPatch(3);}}>3</button>
+                    
+                        <Dropdown
+                            trigger={['click']}
+                            overlay={columnMenu}
+                            animation="slide-up"
+                            onVisibleChange={this.onVisibleChange}
+                        >
+                            <button className="synthToolButton">Columns</button>
+                        </Dropdown>
+                        
+                    </div>
 
                     <div className="keys-container">
                         <Piano
@@ -325,39 +338,54 @@ class RemoteSynth extends Component {
                             keyboardShortcuts={keyboardShortcuts}
                         />
                     </div>
+                    
+                    <div style={{ columnCount: this.state.viewColumns}}>                    
 
-                    <div style={{ columnCount: this.state.viewColumns}}>
-                
-                    {statusArr.length <= 0
-                    ? <div className="status-div">Loading params...</div>
-                    : statusArr.map((param, index) => (
-                        <div key={index} style={index === this.state.highlightedParam ? {color:'red'} : {color:'white'}}>
-                            
-                            {index} : {param}
-                
-                            <Slider
-                                    value={this.state.statusArr[index]}
-                                    onChange={this.handleSliderChange}
-                                    aria-labelledby="input-slider"
-                                    data-slider={index} 
-                                    min={0} 
-                                    max={127} 
-                                    color={'secondary'} 
-                                    style={sliderStyle}
-                            />
+
+                        {statusArr.length <= 0
+                        ? <div className="status-div">Not connected to synth</div>
+                        : statusArr.map((param, index) => (
+                            <div key={index}>{typeof namesArr[index] === 'number' ? <div></div> : 
+                            <div style={index === this.state.highlightedParam ? {color:'red'} : {}}>
+                                
+                                {namesArr[index]} : {param}
+
+                                <Slider
+                                        value={this.state.statusArr[index]}
+                                        onChange={this.handleSliderChange}
+                                        aria-labelledby="input-slider"
+                                        data-slider={index} 
+                                        min={0} 
+                                        max={127} 
+                                        color={'secondary'} 
+                                        style={sliderStyle}
+                                />
+                            </div>
+                        
+                        }
 
                         </div>
 
-                    ))}
-                </div>
+
+                        ))}
+
+
+                    </div>
 
                 <div className="video-container">
-                    <video autoPlay className="remote-video" id="remote-video"></video>
-                    {/* <video autoPlay muted className="local-video" id="local-video"></video> */}
-                </div>
+                        <video autoPlay className="remote-video" id="remote-video"></video>
+                        {/* <video autoPlay muted className="local-video" id="local-video"></video> */}
+                </div> 
 
             </div>
-          </div>
+            }
+
+
+            </div>
+            </div>
+
+
+
         );
     }
 }

@@ -88,15 +88,16 @@ class HostSynth extends Component {
         console.log('emitting to room' + fish);
 
         this.props.socket.on('msg', (data) => {
-            console.log(data);
             if (data === 'RequestConfig') {
                 this.sendStatusArr();
             }
         });
 
+        this.props.socket.on('sendConfig', (data) => {
+                this.loadPatch(data);
+        });
+
         this.props.socket.on('Note', (data) => {
-            console.log('recieved Note message:');
-            console.log(data);
             if (data.type === 'on') {
                 this.playNoteToSynth(data.note);
             } else {
@@ -105,8 +106,6 @@ class HostSynth extends Component {
           });
 
         this.props.socket.on('CC', (data) => {
-            console.log('recieved CC message:');
-            console.log(data);
             this.updateOneParam(data.param, data.value);
           });
 
@@ -118,6 +117,18 @@ class HostSynth extends Component {
 
     }
     
+    loadPatch = (patchArr) => {
+        if (Array.isArray(patchArr)) {
+            console.log(patchArr);
+            this.setState({statusArr: patchArr});
+            
+            for (let i = 0; i < patchArr.length; i++) {
+                this.updateOneParam(i, patchArr[i]);
+            }
+            this.sendStatusArr();
+        }
+    }
+
     playNoteToSynth = (note) => {
         let output = WebMidi.getOutputByName("UM-1");
         output.playNote(note);
@@ -145,7 +156,7 @@ class HostSynth extends Component {
     randomPatch = () => {
         let newStatusArr = [];
         //120 for all CC params
-        for (let i = 0 ; i < 120; i++) {
+        for (let i = 0 ; i < 96; i++) {
             let rndNum = this.rndVal();
             // set the synth
             this.CC(i, rndNum);
@@ -158,7 +169,6 @@ class HostSynth extends Component {
 
     // adjust all notes
     connectToSynth = () => {
-        var input = WebMidi.getInputByName("UM-1");
         this.randomPatch();
         this.setState({conToSynth: true});
         this.addHost();
@@ -168,7 +178,7 @@ class HostSynth extends Component {
 
         let rv = Math.round(v);
 
-        if (rv != this.state.statusArr[i]) {
+        if (rv !== this.state.statusArr[i]) {
             console.log(rv)
             const newArr = this.state.statusArr;
             
@@ -179,7 +189,6 @@ class HostSynth extends Component {
         }
     };
 
-
         async callUser(socketId) {
         const offer = await this.state.peerConnection.createOffer();
         await this.state.peerConnection.setLocalDescription(new RTCSessionDescription(offer));
@@ -188,18 +197,13 @@ class HostSynth extends Component {
             offer,
             to: socketId
         });
-
         console.log(offer);
-
-
-       }
-
+        };
        
 
     render() {
 
         const { statusArr } = this.state;
-
 
         return (
             <div className="container-fluid pb-3">

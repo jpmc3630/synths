@@ -31,7 +31,6 @@ class App extends Component {
 
   render() {
 
-    const { response } = this.state;
 
     return (
 

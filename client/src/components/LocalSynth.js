@@ -6,7 +6,7 @@ import SocketContext from '../context/socket-context.js'
 
 import Slider from '@material-ui/core/Slider';
 import Dropdown from 'rc-dropdown';
-import Menu, { Item as MenuItem, Divider } from 'rc-menu';
+import Menu, { Item as MenuItem } from 'rc-menu';
 import 'rc-dropdown/assets/index.css';
 
 import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
@@ -40,8 +40,6 @@ class LocalSynth extends Component {
 
 
     sendStatusArr = () => {
-        console.log('sendy the status:');
-        console.log({room: this.state.currentRoom, msg: this.state.StatusArr});
         this.props.socket.emit('status', {room: this.state.currentRoom, msg: this.state.statusArr});
     }
 
@@ -100,7 +98,7 @@ class LocalSynth extends Component {
 
         let rv = Math.round(v);
 
-        if (rv != this.state.statusArr[i]) {
+        if (rv !== this.state.statusArr[i]) {
             console.log(rv)
             const newArr = this.state.statusArr;
             
@@ -248,7 +246,7 @@ class LocalSynth extends Component {
             98,
             99,
             100
-        ]
+        ];
 
         const columnMenu = (
             <Menu onSelect={this.onColumnSelect}>
@@ -319,25 +317,25 @@ class LocalSynth extends Component {
                         {statusArr.length <= 0
                         ? <div className="status-div">Not connected to synth</div>
                         : statusArr.map((param, index) => (
-                            <div>{typeof namesArr[index] === 'number' ? <div></div> : 
-                        <div key={index} style={index === this.state.highlightedParam ? {color:'red'} : {}}>
-                            
-                            
-                            {namesArr[index]} : {param}
-                
-                            <Slider
-                                    value={this.state.statusArr[index]}
-                                    onChange={this.handleSliderChange}
-                                    aria-labelledby="input-slider"
-                                    data-slider={index} 
-                                    min={0} 
-                                    max={127} 
-                                    color={'secondary'} 
-                                    style={sliderStyle}
-                            />
+                        <div key={index}>
+                            {typeof namesArr[index] === 'number' ? <div></div> : 
+                            <div style={index === this.state.highlightedParam ? {color:'red'} : {}}>
+                                
+                                {namesArr[index]} : {param}
+                    
+                                <Slider
+                                        value={this.state.statusArr[index]}
+                                        onChange={this.handleSliderChange}
+                                        aria-labelledby="input-slider"
+                                        data-slider={index} 
+                                        min={0} 
+                                        max={127} 
+                                        color={'secondary'} 
+                                        style={sliderStyle}
+                                />
+                            </div>
+                            }
                         </div>
-                        
-                    }</div>
 
                         ))}
                     </div>

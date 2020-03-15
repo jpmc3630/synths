@@ -82,6 +82,9 @@ io.sockets.on('connection', function(socket) {
       console.log(data);
       io.sockets.in(data.room).emit('status', data.msg);
     });
+    socket.on('sendConfig', function(data) {
+      io.sockets.in(data.room).emit('sendConfig', data.msg);
+    });
     socket.on('Note', function(data) {
       console.log('passing Note message:');
       console.log(data);

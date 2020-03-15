@@ -44,6 +44,11 @@ body, a, p, div {
   }
 }
 
+/* .video-container {
+  position: relative;
+  display: block;
+} */
+
 .remote-video {
   position: absolute;
   width: 400px;
@@ -72,6 +77,7 @@ body, a, p, div {
 }
 
 .synthToolbox {
+  position: relative;
   margin-top: 1%;
   margin-bottom: 1%;
 }
