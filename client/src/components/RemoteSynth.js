@@ -9,7 +9,7 @@ import Menu, { Item as MenuItem } from 'rc-menu';
 import 'rc-dropdown/assets/index.css';
 
 import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
-import 'react-piano/dist/styles.css';
+import '../pianoStyles.css';
 
 const { RTCPeerConnection, RTCSessionDescription } = window;
 var servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };

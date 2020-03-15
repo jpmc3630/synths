@@ -10,7 +10,7 @@ import Menu, { Item as MenuItem } from 'rc-menu';
 import 'rc-dropdown/assets/index.css';
 
 import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
-import 'react-piano/dist/styles.css';
+import '../pianoStyles.css';
 
 
 class LocalSynth extends Component {
