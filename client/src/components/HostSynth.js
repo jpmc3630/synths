@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import WebMidi from "webmidi";
 import SocketContext from '../context/socket-context.js'
 const { RTCPeerConnection, RTCSessionDescription } = window;
+var servers = { 'iceServers': [{ 'urls': 'stun:74.125.142.127:19302' }] };
 
 
 class HostSynth extends Component {
@@ -14,7 +15,7 @@ class HostSynth extends Component {
         outputs: [],
         conToSynth: false,
         currentRoom: null,
-        peerConnection: new RTCPeerConnection({ 'iceServers': [{ 'urls': 'stun:74.125.142.127:19302' }] }),
+        peerConnection: new RTCPeerConnection(servers),
         isAlreadyCalling: false
       };
     }
@@ -25,8 +26,8 @@ class HostSynth extends Component {
             console.log(WebMidi.outputs); 
         }, true);
 
-        
-//var  _iceServers = [{ url: 'stun:74.125.142.127:19302' }], // stun.l.google.com - Firefox does not support DNS names.
+        // let servers = { 'iceServers': [{ 'urls': 'stun:74.125.142.127:19302' }] };
+        // // var  _iceServers = [{ url: 'stun:74.125.142.127:19302' }], // stun.l.google.com - Firefox does not support DNS names.
 
         // const connection = new RTCPeerConnection(servers);
         // this.setState({peerConnection: connection});

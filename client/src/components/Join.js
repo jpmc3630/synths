@@ -3,6 +3,7 @@ import SocketContext from '../context/socket-context.js'
 import RemoteSynth from "./RemoteSynth"
 
 
+
 class Join extends Component {
     constructor(props){
       super(props);
