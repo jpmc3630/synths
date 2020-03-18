@@ -28,7 +28,11 @@ body, a, p, div {
   
 } */
 
-
+.inline {
+  position: relative;
+  display: inline;
+  margin-left: 7px;
+}
 
 @media (max-width: 600px) {
   .headerLogo {

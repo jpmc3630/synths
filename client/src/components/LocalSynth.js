@@ -23,19 +23,25 @@ class LocalSynth extends Component {
         outputs: [],
         conToSynth: false,
         currentRoom: null,
-        viewColumns: 1
+        viewColumns: 4,
+        selectedMidiOutId: null,
+        selectedMidiOutName: 'None',
+        selectedMidiInId: null,
+        selectedMidiInName: 'None'
       };
     }
 
     componentDidMount() {
         WebMidi.enable( (err) => {
-            console.log(WebMidi.inputs);
-            console.log(WebMidi.outputs); 
+            if (WebMidi.inputs[0]) this.setState({selectedMidiInId: WebMidi.inputs[0].id, selectedMidiInName: WebMidi.inputs[0].name});
+            if (WebMidi.outputs[0]) this.setState({selectedMidiOutId: WebMidi.outputs[0].id, selectedMidiOutName: WebMidi.outputs[0].name});
+            this.setState({inputs: WebMidi.inputs, outputs: WebMidi.outputs});
         }, true);   
     }
     
     componentWillUnmount() {
         this.props.socket.emit('removeHost');
+        WebMidi.disable();
     }
 
 
@@ -44,17 +50,17 @@ class LocalSynth extends Component {
     }
 
     CC = (cc, value) => {
-        let output = WebMidi.getOutputByName("UM-1");
+        let output = WebMidi.getOutputById(this.state.selectedMidiOutId);
         output.sendControlChange(cc, value);
     }
 
     playNoteToSynth = (note) => {
-        let output = WebMidi.getOutputByName("UM-1");
+        let output = WebMidi.getOutputById(this.state.selectedMidiOutId);
         output.playNote(note);
     }
     
     stopNoteToSynth = (note) => {
-        let output = WebMidi.getOutputByName("UM-1");
+        let output = WebMidi.getOutputById(this.state.selectedMidiOutId);
         output.stopNote(note);
     }
 
@@ -79,19 +85,26 @@ class LocalSynth extends Component {
         this.setState({statusArr: newStatusArr});
     }
 
+    connectToSynth = () => {
+        this.randomPatch();
+        this.recieveCC();
+        // this.setState({conToSynth: true});
+    }
+
     // adjust all notes
     recieveCC = () => {
-        var input = WebMidi.getInputByName("UM-1");
+        var input = WebMidi.getInputById(this.state.selectedMidiInId);
 
         // receive CC is enabled for now
         input.addListener('controlchange', "all", (e) => {
-          console.log("Received 'controlchange' message:");
-          console.log(e.controller.number);
-          console.log(e.value);
+        //   console.log("Received 'controlchange' message:");
+        //   console.log(e.controller.number);
+        //   console.log(e.value);
             
         this.updateOneParam(e.controller.number, e.value);
-        this.setState({conToSynth: true});
+
         });
+        this.setState({conToSynth: true});
     }
 
     updateOneParam(i, v){
@@ -99,7 +112,7 @@ class LocalSynth extends Component {
         let rv = Math.round(v);
 
         if (rv !== this.state.statusArr[i]) {
-            console.log(rv)
+            // console.log(rv)
             const newArr = this.state.statusArr;
             
             // this.handleSliderChange(i, rv)
@@ -139,8 +152,23 @@ class LocalSynth extends Component {
 
     onColumnSelect = ({key}) => {
         this.setState({viewColumns: key});
-      }
+    }
 
+    onMidiOutSelect = ({key}) => {
+        let outputName = '';
+        for (let i = 0; i < this.state.outputs.length; i++) {
+            if (this.state.outputs[i].id === key) outputName = this.state.outputs[i].name;
+        }
+        this.setState({selectedMidiOutId: key, selectedMidiOutName: outputName});
+    }
+      
+    onMidiInSelect = ({key}) => {
+        let inputName = '';
+        for (let i = 0; i < this.state.inputs.length; i++) {
+            if (this.state.inputs[i].id === key) inputName = this.state.inputs[i].name;
+        }
+        this.setState({selectedMidiInId: key, selectedMidiInName: inputName});
+    }
 
     render() {
         
@@ -259,9 +287,25 @@ class LocalSynth extends Component {
             </Menu>
           );
 
+        const midiOutMenu = (
+            <Menu onSelect={this.onMidiOutSelect}>
+                {this.state.outputs.map((item, index) => (
+                    <MenuItem key={this.state.outputs[index].id}>{this.state.outputs[index].name}</MenuItem>
+                ))}
+            </Menu>
+        );
+
+        const midiInMenu = (
+            <Menu onSelect={this.onMidiInSelect}>
+                {this.state.inputs.map((item, index) => (
+                    <MenuItem key={this.state.inputs[index].id}>{this.state.inputs[index].name}</MenuItem>
+                ))}
+            </Menu>
+        );
+
         const sliderStyle = {
             display: "inline-block",
-            color: "gray"
+            color: "gray",
         };
 
 
@@ -278,44 +322,70 @@ class LocalSynth extends Component {
             
             <div className="container-fluid pb-3">
                 <div className="row justify-content-md-center">
-                    <div className="synthToolbox">
+                    
                         {this.state.conToSynth 
                         ? <div>Connected to Synth</div>
-                        : <button className="synthToolButton" onClick={() => {this.recieveCC(); this.randomPatch();}}>Connect to Synth</button>}
-                        <button className="synthToolButton" onClick={this.randomPatch}>Randomise Patch</button>
-                        <button className="synthToolButton" onClick={() => {console.log(this.state.statusArr)}}>Log Patch</button>
-                        <button className="synthToolButton" onClick={() => {this.loadPatch(1);}}>1</button>
-                        <button className="synthToolButton" onClick={() => {this.loadPatch(2);}}>2</button>
-                        <button className="synthToolButton" onClick={() => {this.loadPatch(3);}}>3</button>
-                        <Dropdown
-                            trigger={['click']}
-                            overlay={columnMenu}
-                            animation="slide-up"
-                            onVisibleChange={this.onVisibleChange}
-                        >
-                            <button className="synthToolButton">Columns</button>
-                        </Dropdown>
+                        : <div className="synthToolbox">
+                            <Dropdown
+                                trigger={['click']}
+                                overlay={midiOutMenu}
+                                animation="slide-up"
+                            >
+                                <button className="synthToolButton">Midi Out: {this.state.selectedMidiOutName}</button>
+                            </Dropdown>
+
+                            <Dropdown
+                                trigger={['click']}
+                                overlay={midiInMenu}
+                                animation="slide-up"
+                            >
+                                <button className="synthToolButton">Midi In: {this.state.selectedMidiInName}</button>
+                            </Dropdown>
+                            {(WebMidi.inputs[0]) && (WebMidi.outputs[0]) 
+                            ? <button className="synthToolButton" onClick={this.connectToSynth}>Connect to Synth</button>
+                            : <div className="inline">No synth or midi interface detected.</div>}
+                        </div>}
+                        
+                    {this.state.conToSynth === false
+                    ? <div></div>
+                    :   
+                    <div>
+                        <div>
+                            <button className="synthToolButton" onClick={this.randomPatch}>Randomise Patch</button>
+                            <button className="synthToolButton" onClick={() => {console.log(this.state.statusArr)}}>Log Patch</button>
+                            <button className="synthToolButton" onClick={() => {this.loadPatch(1);}}>1</button>
+                            <button className="synthToolButton" onClick={() => {this.loadPatch(2);}}>2</button>
+                            <button className="synthToolButton" onClick={() => {this.loadPatch(3);}}>3</button>
+                            <Dropdown
+                                trigger={['click']}
+                                overlay={columnMenu}
+                                animation="slide-up"
+                                // onVisibleChange={this.onVisibleChange}
+                            >
+                                <button className="synthToolButton">Columns</button>
+                            </Dropdown>
+                        </div>
+
+                        <div className="keys-container">
+                            <Piano
+                                noteRange={{ first: firstNote, last: lastNote }}
+                                playNote={(midiNumber) => {
+                                    this.playNoteToSynth(midiNumber)
+                                }}
+                                stopNote={(midiNumber) => {
+                                    this.stopNoteToSynth(midiNumber)
+                                }}
+                                // width={1000}
+                                keyboardShortcuts={keyboardShortcuts}
+                            />
+                        </div>
                     </div>
-
-                    <div className="keys-container">
-                        <Piano
-                            noteRange={{ first: firstNote, last: lastNote }}
-                            playNote={(midiNumber) => {
-                                this.playNoteToSynth(midiNumber)
-                            }}
-                            stopNote={(midiNumber) => {
-                                this.stopNoteToSynth(midiNumber)
-                            }}
-                            // width={1000}
-                            keyboardShortcuts={keyboardShortcuts}
-                        />
-                    </div>
-
-                    <div style={{ columnCount: this.state.viewColumns}}>                    
-
+                    }
+                        <div style={{ columnCount: this.state.viewColumns}}>                    
+                    
 
                         {statusArr.length <= 0
-                        ? <div className="status-div">Not connected to synth</div>
+                        ? <div></div>
                         : statusArr.map((param, index) => (
                         <div key={index}>
                             {typeof namesArr[index] === 'number' ? <div></div> : 

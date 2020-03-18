@@ -32,12 +32,6 @@ class RemoteSynth extends Component {
     
     componentDidMount() {
 
-        
-        //var  _iceServers = [{ url: 'stun:74.125.142.127:19302' }], // stun.l.google.com - Firefox does not support DNS names.
-        // var servers = { 'iceServers': [{ 'urls': 'stun:74.125.142.127:19302' }] };
-        // const connection = new RTCPeerConnection(servers);
-        // this.setState({peerConnection: connection});
-
         // listner for socketIO data for statusArr
         this.props.socket.on('status', data => {
             this.setState({ statusArr: data, conToHost: true })
@@ -80,6 +74,7 @@ class RemoteSynth extends Component {
     
     componentWillUnmount() {
         this.props.socket.emit('removeUser'); //needs removeUser function in server
+        WebMidi.disable();
     }
 
     requestStatusArr = () => {
@@ -302,7 +297,7 @@ class RemoteSynth extends Component {
             <div className="row justify-content-md-center">
 
                 {(this.state.conToHost === false)
-                ? <div>Failed to connect to host</div>
+                ? <div>Not connected to host</div>
                 : 
                 <div>
 

@@ -1,6 +1,10 @@
 import React, { Component } from "react";
 import WebMidi from "webmidi";
 import SocketContext from '../context/socket-context.js'
+
+import Dropdown from 'rc-dropdown';
+import Menu, { Item as MenuItem } from 'rc-menu';
+
 const { RTCPeerConnection, RTCSessionDescription } = window;
 var servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
 
@@ -11,26 +15,23 @@ class HostSynth extends Component {
       this.state = {
         statusArr: [],
         highlightedParam: null,
-        inputs: [],
         outputs: [],
         conToSynth: false,
         currentRoom: null,
         peerConnection: new RTCPeerConnection(servers),
-        isAlreadyCalling: false
+        isAlreadyCalling: false,
+        selectedMidiOutId: null,
+        selectedMidiOutName: 'None'
       };
     }
 
     componentDidMount() {
+        
         WebMidi.enable( (err) => {
-            console.log(WebMidi.inputs);
-            console.log(WebMidi.outputs); 
-        }, true);
+            if (WebMidi.outputs[0]) this.setState({selectedMidiOutId: WebMidi.outputs[0].id, selectedMidiOutName: WebMidi.outputs[0].name});
+            this.setState({outputs: WebMidi.outputs});
+        }, true);   
 
-        // let servers = { 'iceServers': [{ 'urls': 'stun:74.125.142.127:19302' }] };
-        // // var  _iceServers = [{ url: 'stun:74.125.142.127:19302' }], // stun.l.google.com - Firefox does not support DNS names.
-
-        // const connection = new RTCPeerConnection(servers);
-        // this.setState({peerConnection: connection});
 
         navigator.getUserMedia(
             { video: true, audio: true },
@@ -75,9 +76,10 @@ class HostSynth extends Component {
        };
 
     }
-    
+
     componentWillUnmount() {
         this.props.socket.emit('removeHost');
+        WebMidi.disable();
     }
 
     addHost = () => {
@@ -167,7 +169,6 @@ class HostSynth extends Component {
         this.sendStatusArr();
     }
 
-    // adjust all notes
     connectToSynth = () => {
         this.randomPatch();
         this.setState({conToSynth: true});
@@ -189,7 +190,9 @@ class HostSynth extends Component {
         }
     };
 
-        async callUser(socketId) {
+
+
+    async callUser(socketId) {
         const offer = await this.state.peerConnection.createOffer();
         await this.state.peerConnection.setLocalDescription(new RTCSessionDescription(offer));
         
@@ -198,12 +201,28 @@ class HostSynth extends Component {
             to: socketId
         });
         console.log(offer);
-        };
+    };
+
+    onMidiOutSelect = ({key}) => {
+        let outputName = '';
+        for (let i = 0; i < this.state.outputs.length; i++) {
+            if (this.state.outputs[i].id === key) outputName = this.state.outputs[i].name;
+        }
+        this.setState({selectedMidiOutId: key, selectedMidiOutName: outputName});
+    }
        
 
     render() {
 
         const { statusArr } = this.state;
+
+        const midiOutMenu = (
+            <Menu onSelect={this.onMidiOutSelect}>
+                {this.state.outputs.map((item, index) => (
+                    <MenuItem key={this.state.outputs[index].id}>{this.state.outputs[index].name}</MenuItem>
+                ))}
+            </Menu>
+        );
 
         return (
             <div className="container-fluid pb-3">
@@ -211,7 +230,17 @@ class HostSynth extends Component {
                 
                     {this.state.conToSynth 
                     ? <div>Connected to Synth</div>
-                    : <button className="synthToolButton" onClick={this.connectToSynth}>Connect to Synth</button>
+                    : <div className="synthToolbox">
+                        <Dropdown
+                            trigger={['click']}
+                            overlay={midiOutMenu}
+                            animation="slide-up"
+                        >
+                            <button className="synthToolButton">Midi Out: {this.state.selectedMidiOutName}</button>
+                        </Dropdown>
+                        
+                        <button className="synthToolButton" onClick={this.connectToSynth}>Connect to Synth</button>
+                    </div>
                     }
 
                     <div style={{ columnCount:4}}>

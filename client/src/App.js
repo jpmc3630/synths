@@ -16,8 +16,16 @@ import SocketContext from './context/socket-context';
 import io from "socket.io-client";
 
 
-let socket = io();
+let socket;
+if (process.env.NODE_ENV === 'development') {
+  socket = io(`http://localhost:3001/`);
+} else {
+  socket = io();
+}
+
+
 // `http://localhost:3001/`
+
 class App extends Component {
 
   constructor() {
