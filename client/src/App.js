@@ -14,10 +14,10 @@ import Host from "./components/Host";
 import Join from "./components/Join";
 
 import Signup from './components/sign-up';
-import LoginForm from './components/login-form'
-import Navbar from './components/navbar'
-import Home from './components/home'
+import LoginForm from './components/login-form';
+import Home from './components/home';
 
+import UserContext from './context/user-context';
 import SocketContext from './context/socket-context';
 import io from "socket.io-client";
 
@@ -28,7 +28,6 @@ if (process.env.NODE_ENV === 'development') {
 } else {
   socket = io();
 }
-
 
 // `http://localhost:3001/`
 
@@ -45,6 +44,7 @@ class App extends Component {
     this.getUser = this.getUser.bind(this)
     this.componentDidMount = this.componentDidMount.bind(this)
     this.updateUser = this.updateUser.bind(this)
+    this.logout = this.logout.bind(this)
   }
 
   componentDidMount() {
@@ -76,72 +76,111 @@ class App extends Component {
     })
   }
 
+  logout(event) {
+    event.preventDefault()
+    console.log('logging out')
+    axios.post('/user/logout').then(response => {
+      console.log(response.data)
+      if (response.status === 200) {
+        this.updateUser({
+          loggedIn: false,
+          username: null
+        })
+      }
+    }).catch(error => {
+        console.log('Logout error')
+    })
+  }
+
   render() {
 
 
     return (
-
-      <SocketContext.Provider value={socket}>
-     
-        <Router>
-          <div className="header">
-          <Navbar updateUser={this.updateUser} loggedIn={this.state.loggedIn} />
-
-              <hr />
-              <div className="headerContent">
-                  <div className="headerLogo">- synths - </div>
-              
-                  <Link to="/local">LOCAL</Link>&nbsp;&nbsp;
-                  <Link to="/host">HOST</Link>&nbsp;&nbsp;
-                  <Link to="/join">JOIN</Link>&nbsp;&nbsp;
-              </div>
-              <hr />
+        <UserContext.Provider value={this.state.username}>
+              <SocketContext.Provider value={socket}>
             
+                <Router>
+                  <div className="header">
+                  
+                      <hr />
+                      <div className="headerContent">
+                          <div className="headerLogo">- synths - </div>
+                        {this.state.loggedIn ? 
+                        <div>
+
+                            <div className="floatRightMenu">
+                                <Link to="#" className="btn btn-link text-secondary" onClick={this.logout}>
+                                              <span className="text-secondary">logout</span>
+                                </Link>&nbsp;&nbsp;
+                                {this.state.username}
+                            </div>
+
+                            <div className="floatLefttMenu">
+                                <Link to="/local">LOCAL</Link>&nbsp;&nbsp;
+                                <Link to="/host">HOST</Link>&nbsp;&nbsp;
+                                <Link to="/join">JOIN</Link>&nbsp;&nbsp;
+                            </div>
+
+                          </div>
+                          :
+                          <div className="floatLeftMenu">
+                              <Link to="/" className="btn btn-link text-secondary">
+                                  <span className="text-secondary">home</span>&nbsp;&nbsp;
+                              </Link>
+                              <Link to="/login" className="btn btn-link text-secondary">
+                                <span className="text-secondary">login</span>&nbsp;&nbsp;
+                              </Link>
+                              <Link to="/signup" className="btn btn-link">
+                                <span className="text-secondary">sign up</span>&nbsp;&nbsp;
+                              </Link>
+
+                          </div>
+                        }
+                      </div>
+                      <hr />
+                    
+                      
+                
+                  </div>
+
               
-        {/* greet user if logged in: */}
-        {this.state.loggedIn &&
-          <p>Join the party, {this.state.username}!</p>
-        }
-          </div>
+                  
+                    <Switch>
+                      <Route exact path="/local">
+                        <Local />
+                      </Route>
+                      <Route exact path="/host">
+                        <Host />
+                      </Route>
+                      <Route path="/join">
+                        <Join />
+                      </Route>
 
-       
+                      <Route
+                  exact path="/"
+                  component={Home} />
+                  
+                      <Route
+                  path="/login"
+                  render={() =>
+                    <LoginForm
+                      updateUser={this.updateUser}
+                    />}
+                />
+                <Route
+                  path="/signup"
+                  render={() =>
+                    <Signup/>}
+                />
+
+
+                    </Switch>
+                  
+                </Router>
           
-            <Switch>
-              <Route exact path="/local">
-                <Local />
-              </Route>
-              <Route exact path="/host">
-                <Host />
-              </Route>
-              <Route path="/join">
-                <Join />
-              </Route>
 
-              <Route
-          exact path="/"
-          component={Home} />
-          
-              <Route
-          path="/login"
-          render={() =>
-            <LoginForm
-              updateUser={this.updateUser}
-            />}
-        />
-        <Route
-          path="/signup"
-          render={() =>
-            <Signup/>}
-        />
-
-
-            </Switch>
-          
-        </Router>
-  
-
-      </SocketContext.Provider>
-
+              </SocketContext.Provider>
+        </UserContext.Provider>      
     );
   }
 }

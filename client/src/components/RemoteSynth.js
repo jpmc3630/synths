@@ -115,6 +115,8 @@ class RemoteSynth extends Component {
         //120 for all CC params
         for (let i = 0 ; i < 96; i++) {
             let rndNum = this.rndVal();
+            if (i === 7) rndNum = 127;
+            if (i === 10) rndNum = 62;
             // set srray
             newStatusArr[i] = rndNum;
         }
@@ -122,7 +124,6 @@ class RemoteSynth extends Component {
     }
 
     
-
     updateOneParam(i, v){
         
         let rv = Math.round(v);

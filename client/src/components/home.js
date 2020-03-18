@@ -11,7 +11,7 @@ class Home extends Component {
             width: 400
         }
         return (
-            <div>
+            <div className="content">
                 <p>It's good to be home</p>
                 <img style={imageStyle} src="https://i.ytimg.com/vi/N1icEHtgb3g/maxresdefault.jpg" />
             </div>

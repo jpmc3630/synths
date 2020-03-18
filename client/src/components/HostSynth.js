@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import WebMidi from "webmidi";
-import SocketContext from '../context/socket-context.js'
+import SocketContext from '../context/socket-context.js';
+import UserContext from '../context/user-context.js';
 
 import Dropdown from 'rc-dropdown';
 import Menu, { Item as MenuItem } from 'rc-menu';
@@ -132,12 +133,12 @@ class HostSynth extends Component {
     }
 
     playNoteToSynth = (note) => {
-        let output = WebMidi.getOutputByName("UM-1");
+        let output = WebMidi.getOutputById(this.state.selectedMidiOutId);
         output.playNote(note);
     }
     
     stopNoteToSynth = (note) => {
-        let output = WebMidi.getOutputByName("UM-1");
+        let output = WebMidi.getOutputById(this.state.selectedMidiOutId);
         output.stopNote(note);
     }
 
@@ -146,7 +147,7 @@ class HostSynth extends Component {
     }
 
     CC = (cc, value) => {
-        let output = WebMidi.getOutputByName("UM-1");
+        let output = WebMidi.getOutputById(this.state.selectedMidiOutId);
         output.sendControlChange(cc, value);
     }
 
@@ -160,8 +161,8 @@ class HostSynth extends Component {
         //120 for all CC params
         for (let i = 0 ; i < 96; i++) {
             let rndNum = this.rndVal();
-            if (i === 4) rndNum = 127;
-            if (i === 5) rndNum = 62;
+            if (i === 7) rndNum = 127;
+            if (i === 10) rndNum = 62;
             // set the synth
             this.CC(i, rndNum);
             // set srray
@@ -229,29 +230,31 @@ class HostSynth extends Component {
         return (
             <div className="container-fluid pb-3">
                 <div className="row justify-content-md-center">
-                
-                    {this.state.conToSynth 
-                    ? <div>Connected to Synth</div>
-                    : <div className="synthToolbox">
 
-                        <video autoPlay muted className="local-video" id="local-video"></video>
-
-                        <Dropdown
-                            trigger={['click']}
-                            overlay={midiOutMenu}
-                            animation="slide-up"
-                        >
-                            <button className="synthToolButton">Midi Out: {this.state.selectedMidiOutName}</button>
-                        </Dropdown>
-                        
-                        <button className="synthToolButton" onClick={this.connectToSynth}>Connect to Synth</button>
+                    
+                    
+                    <div className="synthToolboxHost">
+                    <video autoPlay muted className="local-video" id="local-video"></video>
+                        {this.state.conToSynth === false &&
+                            <div>
+                                <Dropdown
+                                    trigger={['click']}
+                                    overlay={midiOutMenu}
+                                    animation="slide-up"
+                                >
+                                    <button className="synthToolButton">Midi Out: {this.state.selectedMidiOutName}</button>
+                                </Dropdown>
+                                
+                                <button className="synthToolButton" onClick={this.connectToSynth}>Connect to Synth</button>
+                            </div>
+                        }
                     </div>
-                    }
+                    
 
-                    <div style={{ columnCount:4}}>
-                
+                    <div style={{ columnCount:5}}>
+                    
                     {statusArr.length <= 0
-                    ? <div className="status-div">Loading params</div>
+                    ? <div className="status-div"></div>
                     : statusArr.map((param, index) => (
                         <div key={index} style={index === this.state.highlightedParam ? {color:'red'} : {}}>
                         {index} : {param}
@@ -261,10 +264,9 @@ class HostSynth extends Component {
                     ))}
                 </div>
 
-                {/* <div className="video-container">
+                <div className="video-container">
                     
-                    
-                </div> */}
+                </div>
 
             </div>
           </div>
@@ -273,9 +275,13 @@ class HostSynth extends Component {
 }
   
 const HostSynthWithSocket = props => (
-    <SocketContext.Consumer>
-    {socket => <HostSynth {...props} socket={socket} />}
-    </SocketContext.Consumer>
+        <UserContext.Consumer>
+        {user => (
+            <SocketContext.Consumer>
+            {socket => <HostSynth {...props} socket={socket} user={user} />}
+            </SocketContext.Consumer>
+        )}
+        </UserContext.Consumer>    
   )
     
-  export default HostSynthWithSocket;
+export default HostSynthWithSocket;

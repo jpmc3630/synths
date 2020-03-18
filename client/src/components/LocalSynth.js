@@ -74,7 +74,8 @@ class LocalSynth extends Component {
         //120 for all CC params
         for (let i = 0 ; i < 96; i++) {
             let rndNum = this.rndVal();
-            
+            if (i === 7) rndNum = 127;
+            if (i === 10) rndNum = 62;
             // set the synth
             this.CC(i, rndNum);
 
@@ -366,7 +367,7 @@ class LocalSynth extends Component {
                             </Dropdown>
                         </div>
 
-                        <div className="keys-container">
+                        <div className="keys-containerLocal">
                             <Piano
                                 noteRange={{ first: firstNote, last: lastNote }}
                                 playNote={(midiNumber) => {
