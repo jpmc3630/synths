@@ -283,7 +283,7 @@ class RemoteSynth extends Component {
         };
 
         const firstNote = MidiNumbers.fromNote('c2');
-        const lastNote = MidiNumbers.fromNote('f4');
+        const lastNote = MidiNumbers.fromNote('b3');
         const keyboardShortcuts = KeyboardShortcuts.create({
           firstNote: firstNote,
           lastNote: lastNote,
@@ -296,19 +296,30 @@ class RemoteSynth extends Component {
             <div className="container-fluid pb-3">
             <div className="row justify-content-md-center">
 
+
+
+
                 {(this.state.conToHost === false)
                 ? <div>Not connected to host</div>
                 : 
                 <div>
 
+                    {/* <div className="video-container">
+                        
+                    </div>  */}
+
                     <div className="synthToolbox">
                         
+                    <video autoPlay className="remote-video" id="remote-video"></video>
+
                         <button className="synthToolButton" onClick={this.sendRandom}>Randomise Patch</button>
                         <button className="synthToolButton" onClick={() => {console.log(this.state.statusArr)}}>Log Patch</button>
                         <button className="synthToolButton" onClick={() => {this.sendPatch(1);}}>1</button>
                         <button className="synthToolButton" onClick={() => {this.sendPatch(2);}}>2</button>
                         <button className="synthToolButton" onClick={() => {this.sendPatch(3);}}>3</button>
                     
+
+
                         <Dropdown
                             trigger={['click']}
                             overlay={columnMenu}
@@ -321,6 +332,8 @@ class RemoteSynth extends Component {
                     </div>
 
                     <div className="keys-container">
+
+
                         <Piano
                             noteRange={{ first: firstNote, last: lastNote }}
                             playNote={(midiNumber) => {
@@ -366,11 +379,7 @@ class RemoteSynth extends Component {
 
 
                     </div>
-
-                <div className="video-container">
-                        <video autoPlay className="remote-video" id="remote-video"></video>
-                        {/* <video autoPlay muted className="local-video" id="local-video"></video> */}
-                </div> 
+                        {/* was here */}
 
             </div>
             }

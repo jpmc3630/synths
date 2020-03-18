@@ -73,7 +73,8 @@ class App extends Component {
             </Switch>
           
         </Router>
-    
+  
+
       </SocketContext.Provider>
 
     );

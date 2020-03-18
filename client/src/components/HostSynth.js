@@ -160,6 +160,8 @@ class HostSynth extends Component {
         //120 for all CC params
         for (let i = 0 ; i < 96; i++) {
             let rndNum = this.rndVal();
+            if (i === 4) rndNum = 127;
+            if (i === 5) rndNum = 62;
             // set the synth
             this.CC(i, rndNum);
             // set srray
@@ -231,6 +233,9 @@ class HostSynth extends Component {
                     {this.state.conToSynth 
                     ? <div>Connected to Synth</div>
                     : <div className="synthToolbox">
+
+                        <video autoPlay muted className="local-video" id="local-video"></video>
+
                         <Dropdown
                             trigger={['click']}
                             overlay={midiOutMenu}
@@ -256,10 +261,10 @@ class HostSynth extends Component {
                     ))}
                 </div>
 
-                <div className="video-container">
-                    {/* <video autoPlay className="remote-video" id="remote-video"></video> */}
-                    <video autoPlay muted className="local-video" id="local-video"></video>
-                </div>
+                {/* <div className="video-container">
+                    
+                    
+                </div> */}
 
             </div>
           </div>
