@@ -5,12 +5,18 @@ import {
   Route,
   Link
 } from "react-router-dom";
+import axios from 'axios';
 
 import "./App.css";
 
 import Local from "./components/Local";
 import Host from "./components/Host";
 import Join from "./components/Join";
+
+import Signup from './components/sign-up';
+import LoginForm from './components/login-form'
+import Navbar from './components/navbar'
+import Home from './components/home'
 
 import SocketContext from './context/socket-context';
 import io from "socket.io-client";
@@ -32,10 +38,43 @@ class App extends Component {
     super();
     this.state = {
       response: false,
-      socket: false
+      socket: false,
+      loggedIn: false,
+      username: null
     };
+    this.getUser = this.getUser.bind(this)
+    this.componentDidMount = this.componentDidMount.bind(this)
+    this.updateUser = this.updateUser.bind(this)
   }
 
+  componentDidMount() {
+    this.getUser()
+  }
+
+  updateUser (userObject) {
+    this.setState(userObject)
+  }
+
+  getUser() {
+    axios.get('/user/').then(response => {
+      console.log('Get user response: ')
+      console.log(response.data)
+      if (response.data.user) {
+        console.log('Get User: There is a user saved in the server session: ')
+
+        this.setState({
+          loggedIn: true,
+          username: response.data.user.username
+        })
+      } else {
+        console.log('Get user: no user');
+        this.setState({
+          loggedIn: false,
+          username: null
+        })
+      }
+    })
+  }
 
   render() {
 
@@ -46,7 +85,7 @@ class App extends Component {
      
         <Router>
           <div className="header">
-            
+          <Navbar updateUser={this.updateUser} loggedIn={this.state.loggedIn} />
 
               <hr />
               <div className="headerContent">
@@ -58,7 +97,14 @@ class App extends Component {
               </div>
               <hr />
             
+              
+        {/* greet user if logged in: */}
+        {this.state.loggedIn &&
+          <p>Join the party, {this.state.username}!</p>
+        }
           </div>
+
+       
           
             <Switch>
               <Route exact path="/local">
@@ -70,6 +116,25 @@ class App extends Component {
               <Route path="/join">
                 <Join />
               </Route>
+
+              <Route
+          exact path="/"
+          component={Home} />
+          
+              <Route
+          path="/login"
+          render={() =>
+            <LoginForm
+              updateUser={this.updateUser}
+            />}
+        />
+        <Route
+          path="/signup"
+          render={() =>
+            <Signup/>}
+        />
+
+
             </Switch>
           
         </Router>
