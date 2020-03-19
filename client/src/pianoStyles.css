@@ -55,7 +55,7 @@
  * Styles of "active" or pressed-down keys
  */
 .ReactPiano__Key--active {
-  background: rgb(156, 0, 0);
+  background: #f50057;
   /* old   background: #3ac8da; */
 }
 

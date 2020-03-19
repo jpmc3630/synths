@@ -59,7 +59,7 @@
 .rc-dropdown-menu > .rc-dropdown-menu-item:hover,
 .rc-dropdown-menu > .rc-dropdown-menu-item-active,
 .rc-dropdown-menu > .rc-dropdown-menu-item-selected {
-  color: black;
+  color: gray;
   /* #ebfaff; old one */
 }
 .rc-dropdown-menu > .rc-dropdown-menu-item-selected {

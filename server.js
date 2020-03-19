@@ -143,8 +143,17 @@ io.sockets.on('connection', function(socket) {
       io.sockets.in(data.room).emit('Func', data.msg);
     });
 
-
-
+    
+    socket.on('removeUser', function(data) {
+      console.log('passing removeUser message:');
+      console.log(data);
+      io.sockets.in(data.room).emit('removeUser', data.msg);
+      for(let i=0; i < hostsArr.length; i++){         
+        if(hostsArr[i].room === data.room){
+            hostsArr[i].userCount--; 
+        }
+    }
+    });
 
 
     // join room, for joiners

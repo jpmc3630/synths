@@ -151,7 +151,7 @@ class App extends Component {
                           </div>
                         }
                       </div>
-                      <hr class="my-2"/>
+                      <hr className="my-2"/>
                     
                       
                 

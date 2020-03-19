@@ -77,7 +77,8 @@ class RemoteSynth extends Component {
     }
     
     componentWillUnmount() {
-        this.props.socket.emit('removeUser'); //needs removeUser function in server
+        this.props.socket.emit('removeUser', {room: this.state.currentRoom, msg: `removeUser`}); //needs removeUser function in server
+        this.setState({ statusArr: [], conToHost: false });
         WebMidi.disable();
     }
 
@@ -304,7 +305,8 @@ class RemoteSynth extends Component {
 
         const sliderStyle = {
             display: "inline-block",
-            color: "white"
+            color: "gray"
+            
         };
 
         const firstNote = MidiNumbers.fromNote('c2');
@@ -382,7 +384,7 @@ class RemoteSynth extends Component {
                         ? <div className="status-div">Not connected to synth</div>
                         : statusArr.map((param, index) => (
                             <div key={index}>{typeof namesArr[index] === 'number' ? <div></div> : 
-                            <div style={index === this.state.highlightedParam ? {color:'red'} : {}}>
+                            <div style={index === this.state.highlightedParam ? {color:'#f50057'} : {}}>
                                 
                                 {namesArr[index]} : {param}
 

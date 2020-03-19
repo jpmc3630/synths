@@ -306,7 +306,8 @@ class LocalSynth extends Component {
 
         const sliderStyle = {
             display: "inline-block",
-            color: "gray",
+            color: "gray"
+            
         };
 
 
@@ -390,7 +391,7 @@ class LocalSynth extends Component {
                         : statusArr.map((param, index) => (
                         <div key={index}>
                             {typeof namesArr[index] === 'number' ? <div></div> : 
-                            <div style={index === this.state.highlightedParam ? {color:'red'} : {}}>
+                            <div style={index === this.state.highlightedParam ? {color:'#f50057'} : {}}>
                                 
                                 {namesArr[index]} : {param}
                     

@@ -5,14 +5,18 @@ body, a, p, div {
 }
 a {
   text-decoration: none;
+  
 }
 
+
 a:hover {
-    color: rgb(156, 0, 0);;
+    color: #f50057;
+
+    /* old rgb(156, 0, 0) */
 }
 
 .synthToolButton:hover {
-  color: rgb(156, 0, 0);
+  color: #f50057;
   text-decoration: none;
 }
 
@@ -48,7 +52,7 @@ a:hover {
   top: 1px;
   margin-left: 9px;
   position: relative;
-  color: rgb(156, 0, 0);
+  color: #f50057;
 }
 
 .floatLeftMenu {
@@ -213,7 +217,6 @@ input[type=password] {
   background-clip: padding-box;
   border: 1px solid #ccc;
 }
-
 
 
 

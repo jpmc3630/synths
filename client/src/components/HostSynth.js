@@ -121,6 +121,19 @@ class HostSynth extends Component {
                 this.randomPatch();
             }
         });
+        this.props.socket.on('removeUser', (data) => {
+            if (data === 'removeUser') {
+                console.log('Trying to reset connection');
+                this.setState({
+                    highlightedParam: null,
+                    peerConnection: new RTCPeerConnection(servers),
+                    isAlreadyCalling: false,
+                  });
+            }
+        });
+
+
+
 
     }
     
@@ -300,7 +313,7 @@ class HostSynth extends Component {
                     {statusArr.length <= 0
                     ? <div className="status-div"></div>
                     : statusArr.map((param, index) => (
-                        <div key={index} style={index === this.state.highlightedParam ? {color:'red'} : {}}>
+                        <div key={index} style={index === this.state.highlightedParam ? {color:'#f50057'} : {}}>
                         {index} : {param}
 
                     </div>

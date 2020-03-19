@@ -54,7 +54,7 @@
  * Styles of "active" or pressed-down keys
  */
 .ReactPiano__Key--active {
-  background: red;
+  background: #f50057;
   /* old   background: #3ac8da; */
 }
 
@@ -66,7 +66,7 @@
 }
 
 .ReactPiano__Key--active.ReactPiano__Key--natural {
-  border: 1px solid #3ac8da;
+  border: 1px solid #f50057;
   /* Slight height reduction for "pushed-down" effect */
   height: 98%;
 }
