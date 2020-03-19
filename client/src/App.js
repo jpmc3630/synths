@@ -103,14 +103,17 @@ class App extends Component {
                   <div className="">
                   
                   
-                      <div className="">
+                      <div className="headerContent">
                           <div className="headerLogo">- synths - </div>
                         {this.state.loggedIn ? 
                         <div>
 
                             <div className="floatRightMenu">
+                              <Link to="/" className="btn btn-link text-secondary">
+                                    <span className="text-secondary">HOME</span>
+                                </Link>
                                 <Link to="#" className="btn btn-link text-secondary" onClick={this.logout}>
-                                    <span className="text-secondary">logout</span>
+                                    <span className="text-secondary">LOG OUT</span>
                                 </Link>
                                 <span className="userName">{this.state.username}</span>
                             </div>
@@ -145,17 +148,10 @@ class App extends Component {
 
                             </div>
 
-                            <div className="floatLefttMenu">
-                                
-                            <Link to="#" className="btn btn-link text-secondary">
-                                    <span className="text-secondary">&nbsp;</span>
-                            </Link>
-                                
-                            </div>
                           </div>
                         }
                       </div>
-                      <hr class="my-1"/>
+                      <hr class="my-2"/>
                     
                       
                 

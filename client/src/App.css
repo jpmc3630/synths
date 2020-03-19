@@ -25,24 +25,27 @@ a:hover {
   margin-left: 10%;
   margin-right: 10%;
   margin-top: 2%;
-  overflow: hidden;
+  
 }
 .headerLogo {
  position: absolute;
- margin-top: 10px;
- left: 50%;
+ margin-top: 6px;
+ left: 48%;
  transform: translate(-50%);
  display: inline-block;
 }
 
 .headerContent {
-  min-height: 20px;
+  
+  margin-top: 7px;
+  min-height: 38px;
   width: 100%;
 }
 
 .userName {
   margin-right: 10px;
-  top: 2px;
+  top: 1px;
+  margin-left: 9px;
   position: relative;
   color: rgb(156, 0, 0);
 }
@@ -51,12 +54,14 @@ a:hover {
   position: relative;
   display: inline;
   float: left;
+  left: 20px;
 }
 
 .floatRightMenu {
   position: relative;
   display: inline;
   float: right;
+  margin-right: 20px;
 }
 
 .inline {

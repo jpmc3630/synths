@@ -22,7 +22,9 @@ class HostSynth extends Component {
         peerConnection: new RTCPeerConnection(servers),
         isAlreadyCalling: false,
         selectedMidiOutId: null,
-        selectedMidiOutName: 'None'
+        selectedMidiOutName: 'None',
+        selectedMidiMap: 'Select',
+        roomTag: null
       };
     }
 
@@ -85,7 +87,8 @@ class HostSynth extends Component {
 
     addHost = () => {
 
-        let fish = 'room' + this.rndVal() + this.rndVal();
+        let fish = this.state.roomTag;
+        if (!fish) fish = 'Room ' + this.rndVal() + this.rndVal();
         this.setState({currentRoom: fish});
         this.props.socket.emit('room', fish);
         console.log('emitting to room' + fish);
@@ -214,6 +217,13 @@ class HostSynth extends Component {
         this.setState({selectedMidiOutId: key, selectedMidiOutName: outputName});
     }
        
+    onMidiMapSelect = ({key}) => {
+        this.setState({selectedMidiMap: key});
+    }
+
+    handleChangeRoomTag = (event) => {
+        this.setState({roomTag: event.target.value})
+      }
 
     render() {
 
@@ -224,6 +234,13 @@ class HostSynth extends Component {
                 {this.state.outputs.map((item, index) => (
                     <MenuItem key={this.state.outputs[index].id}>{this.state.outputs[index].name}</MenuItem>
                 ))}
+            </Menu>
+        );
+
+        const midiMapMenu = (
+            <Menu onSelect={this.onMidiMapSelect}>
+                    <MenuItem key="ms2000">Korg MS 2000</MenuItem>
+                    <MenuItem key="sp">Moog Slim Phatty</MenuItem>
             </Menu>
         );
 
@@ -245,7 +262,33 @@ class HostSynth extends Component {
                                     <button className="synthToolButton">Midi Out: {this.state.selectedMidiOutName}</button>
                                 </Dropdown>
                                 
-                                <button className="synthToolButton" onClick={this.connectToSynth}>Connect to Synth</button>
+                                <Dropdown
+                                    trigger={['click']}
+                                    overlay={midiMapMenu}
+                                    animation="slide-up"
+                                >
+                                    <button className="synthToolButton">Midi Map: {this.state.selectedMidiMap}</button>
+                                </Dropdown>
+
+                                <div className="form-group">
+                                    <div className="col-2 col-ml-auto">
+                                        <label className="form-label" htmlFor="username">Room name:</label>
+                                    </div>
+                                    <div className="col-3 col-mr-auto">
+                                        <input className="form-input"
+                                            type="text"
+                                            id="roomTag"
+                                            name="roomTag"
+                                            placeholder="Room Name"
+                                            value={this.state.username}
+                                            onChange={this.handleChangeRoomTag}
+                                        />
+                                    </div>
+                                
+                                    <div className="col-3 col-mr-auto">
+                                        <button className="synthToolButton" onClick={this.connectToSynth}>Connect to Synth</button>
+                                    </div>
+                                </div>
                             </div>
                         }
                     </div>
