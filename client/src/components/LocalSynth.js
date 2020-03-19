@@ -322,7 +322,7 @@ class LocalSynth extends Component {
         return (
             
             <div className="container-fluid pb-3">
-                <div className="row justify-content-md-center">
+                <div className="">
                     
                         {this.state.conToSynth 
                         ? <div>Connected to Synth</div>

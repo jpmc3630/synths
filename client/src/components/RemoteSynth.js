@@ -295,8 +295,8 @@ class RemoteSynth extends Component {
         return (
 
             <div className="container-fluid pb-3">
-            <div className="row justify-content-md-center">
-
+            <div className="">
+                    {/* old bs row justify-content-md-center */}
 
 
 
@@ -313,7 +313,7 @@ class RemoteSynth extends Component {
                         
                     <video autoPlay className="remote-video" id="remote-video"></video>
 
-                        <button className="synthToolButton" onClick={this.sendRandom}>Randomise Patch</button>
+                        <button className="btn btn-small synthToolButton" onClick={this.sendRandom}>Randomise Patch</button>
                         <button className="synthToolButton" onClick={() => {console.log(this.state.statusArr)}}>Log Patch</button>
                         <button className="synthToolButton" onClick={() => {this.sendPatch(1);}}>1</button>
                         <button className="synthToolButton" onClick={() => {this.sendPatch(2);}}>2</button>

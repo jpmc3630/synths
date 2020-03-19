@@ -29,6 +29,7 @@ a:hover {
 }
 .headerLogo {
  position: absolute;
+ margin-top: 10px;
  left: 50%;
  transform: translate(-50%);
  display: inline-block;
@@ -37,6 +38,13 @@ a:hover {
 .headerContent {
   min-height: 20px;
   width: 100%;
+}
+
+.userName {
+  margin-right: 10px;
+  top: 2px;
+  position: relative;
+  color: rgb(156, 0, 0);
 }
 
 .floatLeftMenu {
@@ -107,6 +115,27 @@ a:hover {
   background-clip: padding-box;
   border: 3px solid #ccc;
 
+}
+
+hr { border-color: inherit }
+
+input[type=text] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+}
+
+input[type=password] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+}
+
+.formContent {
+  position: relative;
+  width: 20%;
 }
 
 .local-video {

@@ -100,44 +100,62 @@ class App extends Component {
               <SocketContext.Provider value={socket}>
             
                 <Router>
-                  <div className="header">
+                  <div className="">
                   
-                      <hr />
-                      <div className="headerContent">
+                  
+                      <div className="">
                           <div className="headerLogo">- synths - </div>
                         {this.state.loggedIn ? 
                         <div>
 
                             <div className="floatRightMenu">
                                 <Link to="#" className="btn btn-link text-secondary" onClick={this.logout}>
-                                              <span className="text-secondary">logout</span>
-                                </Link>&nbsp;&nbsp;
-                                {this.state.username}
+                                    <span className="text-secondary">logout</span>
+                                </Link>
+                                <span className="userName">{this.state.username}</span>
                             </div>
 
                             <div className="floatLefttMenu">
-                                <Link to="/local">LOCAL</Link>&nbsp;&nbsp;
-                                <Link to="/host">HOST</Link>&nbsp;&nbsp;
-                                <Link to="/join">JOIN</Link>&nbsp;&nbsp;
+                                <Link to="/local" className="btn btn-link text-secondary">
+                                  <span className="text-secondary">LOCAL MODE</span>
+                                </Link>
+                                <Link to="/host" className="btn btn-link text-secondary">
+                                  <span className="text-secondary">HOST</span>
+                                </Link>
+                                <Link to="/join" className="btn btn-link text-secondary">
+                                  <span className="text-secondary">JOIN</span>
+                                </Link>
                             </div>
 
                           </div>
                           :
-                          <div className="floatLeftMenu">
-                              <Link to="/" className="btn btn-link text-secondary">
-                                  <span className="text-secondary">home</span>&nbsp;&nbsp;
-                              </Link>
-                              <Link to="/login" className="btn btn-link text-secondary">
-                                <span className="text-secondary">login</span>&nbsp;&nbsp;
-                              </Link>
-                              <Link to="/signup" className="btn btn-link">
-                                <span className="text-secondary">sign up</span>&nbsp;&nbsp;
-                              </Link>
+                          <div>
+                            <div className="floatRightMenu">
+                                <Link to="/" className="btn btn-link text-secondary">
+                                    <span className="text-secondary">HOME</span>
+                                </Link>
 
+                                <Link to="/signup" className="btn btn-link">
+                                  <span className="text-secondary">SIGN UP</span>
+                                </Link>
+
+                                <Link to="/login" className="btn btn-link text-secondary">
+                                  <span className="text-secondary">LOGIN</span>
+                                </Link>
+
+                            </div>
+
+                            <div className="floatLefttMenu">
+                                
+                            <Link to="#" className="btn btn-link text-secondary">
+                                    <span className="text-secondary">&nbsp;</span>
+                            </Link>
+                                
+                            </div>
                           </div>
                         }
                       </div>
-                      <hr />
+                      <hr class="my-1"/>
                     
                       
                 
