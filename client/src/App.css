@@ -12,7 +12,8 @@ a:hover {
 }
 
 .synthToolButton:hover {
-  color: rgb(156, 0, 0);;
+  color: rgb(156, 0, 0);
+  text-decoration: none;
 }
 
 .header {

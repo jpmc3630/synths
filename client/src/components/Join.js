@@ -57,7 +57,7 @@ class Join extends Component {
           } else {
         return (
             <div className="content">
-              <div>Connected to Host</div>
+              <div></div>
               <RemoteSynth currentRoom={this.state.currentRoom} />
             </div>
         )

@@ -6,7 +6,7 @@ import Slider from '@material-ui/core/Slider';
 import Dropdown from 'rc-dropdown';
 import Menu, { Item as MenuItem } from 'rc-menu';
 //divider is available for drop down menu as { Divider }
-import 'rc-dropdown/assets/index.css';
+import '../dropdown.css';
 
 import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
 import '../pianoStyles.css';
@@ -25,8 +25,12 @@ class RemoteSynth extends Component {
         conToHost: false,
         value: 50,
         currentRoom: this.props.currentRoom,
-        viewColumns: 1,
+        viewColumns: 4,
         peerConnection: new RTCPeerConnection(servers),
+        patches: ['Buzz', 'Voices', 'Tinky'],
+        patchValues: [[102, 48, 119, 94, 31, 56, 46, 69, 108, 52, 96, 67, 88, 77, 83, 126, 85, 56, 55, 31, 69, 113, 44, 75, 48, 11, 2, 62, 42, 35, 106, 30, 68, 60, 27, 1, 12, 78, 63, 40, 41, 78, 28, 90, 1, 7, 19, 117, 108, 57, 19, 0, 16, 19, 86, 64, 23, 19, 52, 121, 113, 111, 1, 100, 22, 70, 51, 12, 7, 103, 3, 99, 62, 10, 48, 31, 65, 9, 100, 28, 111, 123, 93, 3, 72, 121, 67, 103, 25, 26, 87, 42, 5, 39, 33, 7],[80, 3, 0, 107, 89, 108, 13, 90, 20, 61, 54, 74, 40, 110, 48, 38, 36, 39, 106, 38, 70, 116, 62, 108, 92, 79, 46, 14, 102, 19, 52, 61, 119, 104, 79, 72, 115, 104, 29, 54, 88, 74, 21, 90, 74, 40, 44, 32, 36, 101, 117, 126, 93, 76, 26, 55, 86, 116, 127, 119, 77, 22, 28, 78, 2, 122, 96, 119, 86, 39, 95, 37, 66, 105, 8, 30, 45, 82, 116, 96, 91, 106, 55, 87, 3, 76, 115, 27, 3, 35, 67, 71, 51, 18, 64, 87],[55, 0, 110, 18, 3, 0, 83, 127, 121, 41, 60, 59, 0, 3, 0, 81, 18, 125, 59, 61, 127, 127, 0, 116, 60, 28, 61, 60, 61, 66, 66, 22, 115, 52, 114, 4, 90, 10, 45, 98, 62, 24, 111, 19, 113, 48, 38, 81, 59, 71, 8, 109, 8, 28, 79, 0, 84, 96, 51, 7, 85, 78, 101, 36, 23, 75, 38, 57, 15, 124, 90, 76, 61, 64, 45, 82, 0, 38, 54, 72, 81, 95, 74, 56, 80, 64, 88, 57, 15, 49, 60, 68, 48, 62, 65, 74]]
+        ,
+        currentPatch: 'None'
       };
     }
     
@@ -101,14 +105,28 @@ class RemoteSynth extends Component {
         console.log('send status');
     }
 
-    sendPatch = (num) => {
+    sendPatch = ({key}) => {
         console.log('send patch');
+        console.log(key);
         let patchArr = [];
-        if (num === 1) patchArr = [102, 48, 119, 94, 31, 56, 46, 69, 108, 52, 96, 67, 88, 77, 83, 126, 85, 56, 55, 31, 69, 113, 44, 75, 48, 11, 2, 62, 42, 35, 106, 30, 68, 60, 27, 1, 12, 78, 63, 40, 41, 78, 28, 90, 1, 7, 19, 117, 108, 57, 19, 0, 16, 19, 86, 64, 23, 19, 52, 121, 113, 111, 1, 100, 22, 70, 51, 12, 7, 103, 3, 99, 62, 10, 48, 31, 65, 9, 100, 28, 111, 123, 93, 3, 72, 121, 67, 103, 25, 26, 87, 42, 5, 39, 33, 7];
-        if (num === 2) patchArr = [80, 3, 0, 107, 89, 108, 13, 90, 20, 61, 54, 74, 40, 110, 48, 38, 36, 39, 106, 38, 70, 116, 62, 108, 92, 79, 46, 14, 102, 19, 52, 61, 119, 104, 79, 72, 115, 104, 29, 54, 88, 74, 21, 90, 74, 40, 44, 32, 36, 101, 117, 126, 93, 76, 26, 55, 86, 116, 127, 119, 77, 22, 28, 78, 2, 122, 96, 119, 86, 39, 95, 37, 66, 105, 8, 30, 45, 82, 116, 96, 91, 106, 55, 87, 3, 76, 115, 27, 3, 35, 67, 71, 51, 18, 64, 87];
-        if (num === 3) patchArr = [55, 0, 110, 18, 3, 0, 83, 127, 121, 41, 60, 59, 0, 3, 0, 81, 18, 125, 59, 61, 127, 127, 0, 116, 60, 28, 61, 60, 61, 66, 66, 22, 115, 52, 114, 4, 90, 10, 45, 98, 62, 24, 111, 19, 113, 48, 38, 81, 59, 71, 8, 109, 8, 28, 79, 0, 84, 96, 51, 7, 85, 78, 101, 36, 23, 75, 38, 57, 15, 124, 90, 76, 61, 64, 45, 82, 0, 38, 54, 72, 81, 95, 74, 56, 80, 64, 88, 57, 15, 49, 60, 68, 48, 62, 65, 74];
+        key = parseInt(key);
+        let patchName = this.state.patches[key];
+        patchArr = this.state.patchValues[key];
         this.sendStatusArr(patchArr);
+        this.setState({currentPatch: patchName});
     }
+
+    savePatch = () => {
+        console.log(this.state.statusArr);
+        let newPatchValue = this.state.statusArr;
+        let newPatchName = 'Patch '+ this.rndVal() + this.rndVal();
+        let patchNameArr = this.state.patches;
+        let patchValuesArr = this.state.patchValues;
+        patchNameArr.push(newPatchName);
+        patchValuesArr.push(newPatchValue);
+        this.setState({patches: patchNameArr, patchValues: patchValuesArr, currentPatch: newPatchName});
+    }
+   
 
     sendRandom = () => {
         let newStatusArr = [];
@@ -158,8 +176,6 @@ class RemoteSynth extends Component {
     onColumnSelect = ({key}) => {
         this.setState({viewColumns: key});
       }
-
-
 
     render() {
 
@@ -278,6 +294,14 @@ class RemoteSynth extends Component {
             </Menu>
         );
 
+        const patchMenu = (
+            <Menu onSelect={this.sendPatch}>
+                {this.state.patches.map((item, index) => (
+                    <MenuItem key={index}>{item}</MenuItem>
+                ))}
+            </Menu>
+        );
+
         const sliderStyle = {
             display: "inline-block",
             color: "white"
@@ -314,11 +338,14 @@ class RemoteSynth extends Component {
                     <video autoPlay className="remote-video" id="remote-video"></video>
 
                         <button className="btn btn-small synthToolButton" onClick={this.sendRandom}>Randomise Patch</button>
-                        <button className="synthToolButton" onClick={() => {console.log(this.state.statusArr)}}>Log Patch</button>
-                        <button className="synthToolButton" onClick={() => {this.sendPatch(1);}}>1</button>
-                        <button className="synthToolButton" onClick={() => {this.sendPatch(2);}}>2</button>
-                        <button className="synthToolButton" onClick={() => {this.sendPatch(3);}}>3</button>
-                    
+                        <button className="synthToolButton" onClick={this.savePatch}>Save Patch</button>
+                        <Dropdown
+                            trigger={['click']}
+                            overlay={patchMenu}
+                            animation="slide-up"
+                        >
+                            <button className="synthToolButton">User Patch:{this.state.currentPatch}</button>
+                        </Dropdown>
 
 
                         <Dropdown

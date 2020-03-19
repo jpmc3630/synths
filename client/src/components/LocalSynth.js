@@ -7,7 +7,7 @@ import SocketContext from '../context/socket-context.js'
 import Slider from '@material-ui/core/Slider';
 import Dropdown from 'rc-dropdown';
 import Menu, { Item as MenuItem } from 'rc-menu';
-import 'rc-dropdown/assets/index.css';
+import '../dropdown.css';
 
 import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
 import '../pianoStyles.css';

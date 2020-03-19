@@ -5,6 +5,7 @@ import UserContext from '../context/user-context.js';
 
 import Dropdown from 'rc-dropdown';
 import Menu, { Item as MenuItem } from 'rc-menu';
+import '../dropdown.css';
 
 const { RTCPeerConnection, RTCSessionDescription } = window;
 var servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
