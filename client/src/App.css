@@ -219,7 +219,10 @@ input[type=password] {
 }
 
 
-
+.nudgeLeft {
+  position: relative;
+  left: -20px;
+}
 
 /* .App {
   text-align: center;

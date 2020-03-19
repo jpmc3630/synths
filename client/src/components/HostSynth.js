@@ -129,6 +129,49 @@ class HostSynth extends Component {
                     peerConnection: new RTCPeerConnection(servers),
                     isAlreadyCalling: false,
                   });
+
+
+                  navigator.getUserMedia(
+                    { video: true, audio: true },
+                    stream => {
+                      const localVideo = document.getElementById("local-video");
+                      if (localVideo) {
+                        localVideo.srcObject = stream;
+                      }
+        
+                      stream.getTracks().forEach(track => this.state.peerConnection.addTrack(track, stream));
+                      //suss on that one
+                    },
+                    error => {
+                      console.warn(error.message);
+                    }
+                );
+        
+        
+                this.props.socket.on('initiate-video', (data) => {
+                    console.log(data);
+                    this.callUser(data);
+                });
+        
+        
+                this.props.socket.on("answer-made", async data => {
+                    console.log('answer made');
+                    await this.state.peerConnection.setRemoteDescription(
+                        new RTCSessionDescription(data.answer)
+                    );
+                    
+                    if (!this.state.isAlreadyCalling) {
+                        this.callUser(data.socket);
+                        this.setState({isAlreadyCalling: true});
+                    }
+                });
+        
+                this.state.peerConnection.ontrack = function({ streams: [stream] }) {
+                    const remoteVideo = document.getElementById("remote-video");
+                    if (remoteVideo) {
+                    remoteVideo.srcObject = stream;
+                    }
+               };
             }
         });
 

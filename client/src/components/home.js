@@ -24,13 +24,13 @@ class Home extends Component {
             <div className="content">
 
             {this.props.user ? 
-                <div className="">
+                <div className="text-center nudgeLeft">
 
-                <p>You are logged in as <span className="lead">{this.props.user}!</span></p>
+                <p>You are logged in as <span className="lead">{this.props.user}!</span></p><br></br>
                 <p>News:<br />17/3 - New Midi Map added: Arturia Minibrute
                 <br />15/3 - New Midi Map added: Moog Slim Phatty
                 </p>
-
+                <br></br>
                             <Link to="/local" className="btn btn-link text-secondary">
                                 <span className="synthToolButton">LOCAL MODE</span>
                             </Link>
@@ -42,13 +42,13 @@ class Home extends Component {
                             </Link>
 
                 </div>
-                :<div>
-                
-                    <p className="lead"> Welcome to Synths</p>
+                :<div className="text-center nudgeLeft">
+                <br></br>
+                    <p className="lead"> Welcome to Synths</p><br></br>
                     <p> This app is for sharing hardware synthesisers online!</p>
                     <p> You can share synths, or play synths that others are sharing!</p>
                     <p> You are not logged in. You will need to log in or sign up to use this app.</p>
-
+                            <br></br><br></br>
                 
                     <Link to="/signup" className="btn btn-link">
                         <span className="synthToolButton">SIGN UP</span>
