@@ -92,9 +92,17 @@ class HostSynth extends Component {
         WebMidi.disable();
     }
 
+    logSignalState = () => {
+        console.log(this.state.peerConnection.signalingState);
+    }
 
     resetIsCallingVar = () => {
-        this.setState({isAlreadyCalling: false});
+        console.log(servers);
+        this.setState({
+            highlightedParam: null,
+            peerConnection: new RTCPeerConnection(servers),
+            isAlreadyCalling: false,
+          });
         console.log(this.state.isAlreadyCalling);
     }
 
@@ -149,11 +157,11 @@ class HostSynth extends Component {
         // this.props.socket.on('removeUser', (data) => {
         //     if (data === 'removeUser') {
         //         console.log('Trying to reset connection');
-        //         this.setState({
-        //             highlightedParam: null,
-        //             peerConnection: new RTCPeerConnection(servers),
-        //             isAlreadyCalling: false,
-        //           });
+                // this.setState({
+                //     highlightedParam: null,
+                //     peerConnection: new RTCPeerConnection(servers),
+                //     isAlreadyCalling: false,
+                //   });
 
 
         //           navigator.getUserMedia(
@@ -365,6 +373,7 @@ class HostSynth extends Component {
 
                     <div style={{ columnCount:5}}>
                     <button className="synthToolButton" onClick={this.resetIsCallingVar}>Reset Calling Variable</button>
+                    <button className="synthToolButton" onClick={this.logSignalState}>logSignalState</button>
                     {statusArr.length <= 0
                     ? <div className="status-div"></div>
                     : statusArr.map((param, index) => (
