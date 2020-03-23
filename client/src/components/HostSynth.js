@@ -62,6 +62,7 @@ class HostSynth extends Component {
 
 
         peerconnection1.oniceconnectionstatechange = () => {
+            console.log(peerconnection1.iceConnectionState);
             if(peerconnection1.iceConnectionState == 'disconnected') {
                 console.log('Disconnected');
 
