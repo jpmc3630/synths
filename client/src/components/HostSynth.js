@@ -30,7 +30,8 @@ class HostSynth extends Component {
     }
 
     componentDidMount() {
-        
+
+
         WebMidi.enable( (err) => {
             if (WebMidi.outputs[0]) this.setState({selectedMidiOutId: WebMidi.outputs[0].id, selectedMidiOutName: WebMidi.outputs[0].name});
             this.setState({outputs: WebMidi.outputs});
@@ -57,7 +58,12 @@ class HostSynth extends Component {
         this.props.socket.on('initiate-video', (data) => {
             console.log(data);
             this.callUser(data);
+
+            console.log(this.props.socket.id);
+            console.log(this.props.socket.id);
+            console.log(this.props.socket.id);
         });
+
 
 
         this.props.socket.on("answer-made", async data => {
@@ -85,6 +91,24 @@ class HostSynth extends Component {
         this.props.socket.emit('removeHost');
         WebMidi.disable();
     }
+
+
+    resetIsCallingVar = () => {
+        this.setState({isAlreadyCalling: false});
+        console.log(this.state.isAlreadyCalling);
+    }
+
+    async callUser(socketId) {
+        const offer = await this.state.peerConnection.createOffer();
+        await this.state.peerConnection.setLocalDescription(new RTCSessionDescription(offer));
+        
+        this.props.socket.emit("call-user", {
+            offer,
+            to: socketId
+        });
+        console.log(offer);
+    };
+
 
     addHost = () => {
 
@@ -121,61 +145,61 @@ class HostSynth extends Component {
                 this.randomPatch();
             }
         });
-        this.props.socket.on('removeUser', (data) => {
-            if (data === 'removeUser') {
-                console.log('Trying to reset connection');
-                this.setState({
-                    highlightedParam: null,
-                    peerConnection: new RTCPeerConnection(servers),
-                    isAlreadyCalling: false,
-                  });
+
+        // this.props.socket.on('removeUser', (data) => {
+        //     if (data === 'removeUser') {
+        //         console.log('Trying to reset connection');
+        //         this.setState({
+        //             highlightedParam: null,
+        //             peerConnection: new RTCPeerConnection(servers),
+        //             isAlreadyCalling: false,
+        //           });
 
 
-                  navigator.getUserMedia(
-                    { video: true, audio: true },
-                    stream => {
-                      const localVideo = document.getElementById("local-video");
-                      if (localVideo) {
-                        localVideo.srcObject = stream;
-                      }
+        //           navigator.getUserMedia(
+        //             { video: true, audio: true },
+        //             stream => {
+        //               const localVideo = document.getElementById("local-video");
+        //               if (localVideo) {
+        //                 localVideo.srcObject = stream;
+        //               }
         
-                      stream.getTracks().forEach(track => this.state.peerConnection.addTrack(track, stream));
-                      //suss on that one
-                    },
-                    error => {
-                      console.warn(error.message);
-                    }
-                );
-        
-        
-                this.props.socket.on('initiate-video', (data) => {
-                    console.log(data);
-                    this.callUser(data);
-                });
+        //               stream.getTracks().forEach(track => this.state.peerConnection.addTrack(track, stream));
+        //               //suss on that one
+        //             },
+        //             error => {
+        //               console.warn(error.message);
+        //             }
+        //         );
         
         
-                this.props.socket.on("answer-made", async data => {
-                    console.log('answer made');
-                    await this.state.peerConnection.setRemoteDescription(
-                        new RTCSessionDescription(data.answer)
-                    );
+        //         this.props.socket.on('initiate-video', (data) => {
+        //             console.log(data);
+        //             this.callUser(data);
+        //         });
+        
+        
+        //         this.props.socket.on("answer-made", async data => {
+        //             console.log('answer made');
+        //             await this.state.peerConnection.setRemoteDescription(
+        //                 new RTCSessionDescription(data.answer)
+        //             );
                     
-                    if (!this.state.isAlreadyCalling) {
-                        this.callUser(data.socket);
-                        this.setState({isAlreadyCalling: true});
-                    }
-                });
+        //             if (!this.state.isAlreadyCalling) {
+        //                 this.callUser(data.socket);
+        //                 this.setState({isAlreadyCalling: true});
+        //             }
+        //         });
         
-                this.state.peerConnection.ontrack = function({ streams: [stream] }) {
-                    const remoteVideo = document.getElementById("remote-video");
-                    if (remoteVideo) {
-                    remoteVideo.srcObject = stream;
-                    }
-               };
-            }
-        });
-
-
+        //         this.state.peerConnection.ontrack = function({ streams: [stream] }) {
+        //             const remoteVideo = document.getElementById("remote-video");
+        //             if (remoteVideo) {
+        //             remoteVideo.srcObject = stream;
+        //             }
+        //        };
+        //     }
+            
+        // });
 
 
     }
@@ -253,18 +277,6 @@ class HostSynth extends Component {
         }
     };
 
-
-
-    async callUser(socketId) {
-        const offer = await this.state.peerConnection.createOffer();
-        await this.state.peerConnection.setLocalDescription(new RTCSessionDescription(offer));
-        
-        this.props.socket.emit("call-user", {
-            offer,
-            to: socketId
-        });
-        console.log(offer);
-    };
 
     onMidiOutSelect = ({key}) => {
         let outputName = '';
@@ -352,13 +364,13 @@ class HostSynth extends Component {
                     
 
                     <div style={{ columnCount:5}}>
-                    
+                    <button className="synthToolButton" onClick={this.resetIsCallingVar}>Reset Calling Variable</button>
                     {statusArr.length <= 0
                     ? <div className="status-div"></div>
                     : statusArr.map((param, index) => (
                         <div key={index} style={index === this.state.highlightedParam ? {color:'#f50057'} : {}}>
                         {index} : {param}
-
+                        
                     </div>
 
                     ))}

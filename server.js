@@ -233,7 +233,14 @@ io.sockets.on('connection', function(socket) {
       socket.to(data.to).emit("call-made", {
         offer: data.offer,
         socket: socket.id
+        //  data.to is the JOINER socketID i think
+        // socket.id is the hosts socketID i think
       });
+
+      console.log('socket.id :');
+      console.log(socket.id);
+      console.log('data.to:');
+      console.log(data.to);
 
       console.log('call user');
 

@@ -40,7 +40,9 @@ class RemoteSynth extends Component {
         this.props.socket.on('status', data => {
             this.setState({ statusArr: data, conToHost: true })
         });
-
+        console.log(this.props.socket.id);
+        console.log(this.props.socket.id);
+        console.log(this.props.socket.id);
         // will use for input midi device ie. input keyboard
         // WebMidi.enable( (err) => {
         //     console.log(WebMidi.inputs);
