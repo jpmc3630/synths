@@ -10,6 +10,11 @@ import '../dropdown.css';
 const { RTCPeerConnection, RTCSessionDescription } = window;
 var servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
 
+var peerconnection1 = new RTCPeerConnection(servers);
+
+// myPeerConnectionsMap = {
+//    'pc1' : peerconnection1
+// };
 
 class HostSynth extends Component {
     constructor(props){
@@ -46,7 +51,7 @@ class HostSynth extends Component {
                 localVideo.srcObject = stream;
               }
 
-              stream.getTracks().forEach(track => this.state.peerConnection.addTrack(track, stream));
+              stream.getTracks().forEach(track => peerconnection1.addTrack(track, stream));
               //suss on that one
             },
             error => {
@@ -55,9 +60,14 @@ class HostSynth extends Component {
         );
 
 
-        this.props.socket.on('initiate-video', (data) => {
+        this.props.socket.on('initiate-video', async (data) => {
+
+            await this.resetIsCallingVar();
+
             console.log(data);
             this.callUser(data);
+
+
 
             console.log(this.props.socket.id);
             console.log(this.props.socket.id);
@@ -68,7 +78,7 @@ class HostSynth extends Component {
 
         this.props.socket.on("answer-made", async data => {
             console.log('answer made');
-            await this.state.peerConnection.setRemoteDescription(
+            await peerconnection1.setRemoteDescription(
                 new RTCSessionDescription(data.answer)
             );
             
@@ -78,7 +88,7 @@ class HostSynth extends Component {
             }
         });
 
-        this.state.peerConnection.ontrack = function({ streams: [stream] }) {
+        peerconnection1.ontrack = function({ streams: [stream] }) {
             const remoteVideo = document.getElementById("remote-video");
             if (remoteVideo) {
             remoteVideo.srcObject = stream;
@@ -93,7 +103,7 @@ class HostSynth extends Component {
     }
 
     logSignalState = () => {
-        console.log(this.state.peerConnection.signalingState);
+        console.log(peerconnection1.signalingState);
     }
 
     resetIsCallingVar = () => {
@@ -107,8 +117,8 @@ class HostSynth extends Component {
     }
 
     async callUser(socketId) {
-        const offer = await this.state.peerConnection.createOffer();
-        await this.state.peerConnection.setLocalDescription(new RTCSessionDescription(offer));
+        const offer = await peerconnection1.createOffer();
+        await peerconnection1.setLocalDescription(new RTCSessionDescription(offer));
         
         this.props.socket.emit("call-user", {
             offer,
@@ -172,7 +182,7 @@ class HostSynth extends Component {
         //                 localVideo.srcObject = stream;
         //               }
         
-        //               stream.getTracks().forEach(track => this.state.peerConnection.addTrack(track, stream));
+        //               stream.getTracks().forEach(track => peerconnection1.addTrack(track, stream));
         //               //suss on that one
         //             },
         //             error => {
@@ -189,7 +199,7 @@ class HostSynth extends Component {
         
         //         this.props.socket.on("answer-made", async data => {
         //             console.log('answer made');
-        //             await this.state.peerConnection.setRemoteDescription(
+        //             await peerconnection1.setRemoteDescription(
         //                 new RTCSessionDescription(data.answer)
         //             );
                     
@@ -199,7 +209,7 @@ class HostSynth extends Component {
         //             }
         //         });
         
-        //         this.state.peerConnection.ontrack = function({ streams: [stream] }) {
+        //         peerconnection1.ontrack = function({ streams: [stream] }) {
         //             const remoteVideo = document.getElementById("remote-video");
         //             if (remoteVideo) {
         //             remoteVideo.srcObject = stream;
