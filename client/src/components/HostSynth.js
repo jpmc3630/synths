@@ -10,6 +10,7 @@ import '../dropdown.css';
 const { RTCPeerConnection, RTCSessionDescription } = window;
 var servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
 
+
 var peerconnection1 = new RTCPeerConnection(servers);
 
 // myPeerConnectionsMap = {
@@ -25,7 +26,7 @@ class HostSynth extends Component {
         outputs: [],
         conToSynth: false,
         currentRoom: null,
-        // peerConnection: new RTCPeerConnection(servers),
+        peerConnectionCounter: 0,
         isAlreadyCalling: false,
         selectedMidiOutId: null,
         selectedMidiOutName: 'None',
@@ -60,14 +61,39 @@ class HostSynth extends Component {
         );
 
 
-        this.props.socket.on('initiate-video', (data) => {
+        peerconnection1.oniceconnectionstatechange = () => {
+            if(peerconnection1.iceConnectionState == 'disconnected') {
+                console.log('Disconnected');
 
-            // await this.resetIsCallingVar(); this was a new idea
+                peerconnection1.close();
+                
+                peerconnection1 = null;
+                this.setState({isAlreadyCalling: false});
+                peerconnection1 = new RTCPeerConnection(servers);
+
+
+                navigator.getUserMedia(
+                    { video: true, audio: true },
+                    stream => {
+                    const localVideo = document.getElementById("local-video");
+                    if (localVideo) {
+                        localVideo.srcObject = stream;
+                    }
+
+                    stream.getTracks().forEach(track => peerconnection1.addTrack(track, stream));
+                    //suss on that one
+                    },
+                    error => {
+                    console.warn(error.message);
+                    }
+                );
+            }
+        }
+
+        this.props.socket.on('initiate-video', (data) => {
 
             console.log(data);
             this.callUser(data);
-
-
 
             console.log(this.props.socket.id);
             console.log(this.props.socket.id);
