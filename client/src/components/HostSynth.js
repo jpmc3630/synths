@@ -25,7 +25,7 @@ class HostSynth extends Component {
         outputs: [],
         conToSynth: false,
         currentRoom: null,
-        peerConnection: new RTCPeerConnection(servers),
+        // peerConnection: new RTCPeerConnection(servers),
         isAlreadyCalling: false,
         selectedMidiOutId: null,
         selectedMidiOutName: 'None',
@@ -60,9 +60,9 @@ class HostSynth extends Component {
         );
 
 
-        this.props.socket.on('initiate-video', async (data) => {
+        this.props.socket.on('initiate-video', (data) => {
 
-            await this.resetIsCallingVar();
+            // await this.resetIsCallingVar(); this was a new idea
 
             console.log(data);
             this.callUser(data);
