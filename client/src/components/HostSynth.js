@@ -163,7 +163,19 @@ class HostSynth extends Component {
 
             console.log('initiate video listener');
 
-            let servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
+            var servers= {
+                'iceServers': [
+                  {
+                    'url': 'stun:stun.l.google.com:19302'
+                  },
+                  {
+                    'url': 'turn:numb.viagenie.ca',
+                    'credential': 'thisismypass',
+                    'username': 'jamespmcglone@gmail.com'
+                }
+                ]
+              }
+
             let peerConnection = new RTCPeerConnection(servers);
             peerConnections[id] = peerConnection;
           

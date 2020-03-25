@@ -58,11 +58,28 @@ class RemoteSynth extends Component {
 
         this.requestStatusArr();
 
-        
+
+        //let servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
+
+
+
         // listener for RTC call
             this.props.socket.on("call-made", async data => {
                 console.log(tally);
-                let servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
+                
+                var servers= {
+                    'iceServers': [
+                      {
+                        'url': 'stun:stun.l.google.com:19302'
+                      },
+                      {
+                        'url': 'turn:numb.viagenie.ca',
+                        'credential': 'thisismypass',
+                        'username': 'jamespmcglone@gmail.com'
+                    }
+                    ]
+                  }
+
                 let peerConnection = new RTCPeerConnection(servers);
                 peerConnections[tally] = peerConnection;
                 // peerConnections[tally].restartIce();
