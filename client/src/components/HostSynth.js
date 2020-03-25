@@ -8,10 +8,6 @@ import Menu, { Item as MenuItem } from 'rc-menu';
 import '../dropdown.css';
 
 const { RTCPeerConnection, RTCSessionDescription } = window;
-var servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
-
-
-var peerconnection1 = new RTCPeerConnection(servers);
 
 // myPeerConnectionsMap = {
 //    'pc1' : peerconnection1
@@ -44,15 +40,16 @@ class HostSynth extends Component {
         }, true);   
 
 
+ 
         navigator.getUserMedia(
             { video: true, audio: true },
             stream => {
-              const localVideo = document.getElementById("local-video");
+            const localVideo = document.getElementById("local-video");
               if (localVideo) {
                 localVideo.srcObject = stream;
               }
 
-              stream.getTracks().forEach(track => peerconnection1.addTrack(track, stream));
+            //   stream.getTracks().forEach(track => peerconnection1.addTrack(track, stream));
               //suss on that one
             },
             error => {
@@ -115,6 +112,16 @@ class HostSynth extends Component {
         // });
 
         this.props.socket.on('initiate-video', (data) => {
+
+            var servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
+
+            var peerconnection1 = new RTCPeerConnection(servers);
+          
+            const localVideo = document.getElementById("local-video");
+            if (localVideo) {
+            let stream = localVideo.srcObject;
+            stream.getTracks().forEach(track => peerConnections[id].addTrack(track, stream));
+            }
 
             console.log(data);
             this.callUser(data);
