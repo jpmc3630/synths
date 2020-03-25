@@ -13,6 +13,7 @@ import '../pianoStyles.css';
 
 const { RTCPeerConnection, RTCSessionDescription } = window;
 var servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
+let peerConnection = {};
 
 class RemoteSynth extends Component {
     constructor(props){
@@ -26,7 +27,7 @@ class RemoteSynth extends Component {
         value: 50,
         currentRoom: this.props.currentRoom,
         viewColumns: 4,
-        peerConnection: new RTCPeerConnection(servers),
+        
         patches: ['Buzz', 'Voices', 'Tinky'],
         patchValues: [[102, 48, 119, 94, 31, 56, 46, 69, 108, 52, 96, 67, 88, 77, 83, 126, 85, 56, 55, 31, 69, 113, 44, 75, 48, 11, 2, 62, 42, 35, 106, 30, 68, 60, 27, 1, 12, 78, 63, 40, 41, 78, 28, 90, 1, 7, 19, 117, 108, 57, 19, 0, 16, 19, 86, 64, 23, 19, 52, 121, 113, 111, 1, 100, 22, 70, 51, 12, 7, 103, 3, 99, 62, 10, 48, 31, 65, 9, 100, 28, 111, 123, 93, 3, 72, 121, 67, 103, 25, 26, 87, 42, 5, 39, 33, 7],[80, 3, 0, 107, 89, 108, 13, 90, 20, 61, 54, 74, 40, 110, 48, 38, 36, 39, 106, 38, 70, 116, 62, 108, 92, 79, 46, 14, 102, 19, 52, 61, 119, 104, 79, 72, 115, 104, 29, 54, 88, 74, 21, 90, 74, 40, 44, 32, 36, 101, 117, 126, 93, 76, 26, 55, 86, 116, 127, 119, 77, 22, 28, 78, 2, 122, 96, 119, 86, 39, 95, 37, 66, 105, 8, 30, 45, 82, 116, 96, 91, 106, 55, 87, 3, 76, 115, 27, 3, 35, 67, 71, 51, 18, 64, 87],[55, 0, 110, 18, 3, 0, 83, 127, 121, 41, 60, 59, 0, 3, 0, 81, 18, 125, 59, 61, 127, 127, 0, 116, 60, 28, 61, 60, 61, 66, 66, 22, 115, 52, 114, 4, 90, 10, 45, 98, 62, 24, 111, 19, 113, 48, 38, 81, 59, 71, 8, 109, 8, 28, 79, 0, 84, 96, 51, 7, 85, 78, 101, 36, 23, 75, 38, 57, 15, 124, 90, 76, 61, 64, 45, 82, 0, 38, 54, 72, 81, 95, 74, 56, 80, 64, 88, 57, 15, 49, 60, 68, 48, 62, 65, 74]]
         ,
@@ -51,13 +52,15 @@ class RemoteSynth extends Component {
 
         this.requestStatusArr();
 
+        peerConnection = new RTCPeerConnection(servers);
+
         // listener for RTC call
             this.props.socket.on("call-made", async data => {
-                await this.state.peerConnection.setRemoteDescription(
+                await peerConnection.setRemoteDescription(
                 new RTCSessionDescription(data.offer)
                 );
-            const answer = await this.state.peerConnection.createAnswer();
-            await this.state.peerConnection.setLocalDescription(new RTCSessionDescription(answer));
+            const answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(new RTCSessionDescription(answer));
             
                 this.props.socket.emit("make-answer", {
                     answer,
@@ -65,7 +68,7 @@ class RemoteSynth extends Component {
                 });
            });
 
-           this.state.peerConnection.ontrack = function({ streams: [stream] }) {
+           peerConnection.ontrack = function({ streams: [stream] }) {
             const remoteVideo = document.getElementById("remote-video");
             if (remoteVideo) {
             remoteVideo.srcObject = stream;
