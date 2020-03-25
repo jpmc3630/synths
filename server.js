@@ -102,8 +102,7 @@ io.sockets.on('connection', function(socket) {
         hostsArr.push({
           room: roomName,
           hostSocket: socket.id,
-          userCount: 0,
-          users: []
+          userCount: 0
         });
 
         io.sockets.emit('getHosts', hostsArr)
@@ -149,20 +148,11 @@ io.sockets.on('connection', function(socket) {
       console.log('passing removeUser message:');
       console.log(data);
       io.sockets.in(data.room).emit('removeUser', data.msg);
-          for(let i=0; i < hostsArr.length; i++){
-            for(let j=0; j < hostsArr[i].users.length; j++) {
-                if (hostsArr[i].users[j] === socket.id) {
-                  console.log('a user has disconnected - the host has been notified REMOVE USER FUNC');
-
-                  socket.to(hostsArr[i].hostSocket).emit("removeUser", socket.id);    
-                  // We have already messaged, just want to remove from array!
-
-                  hostsArr[i].users.splice(j,1);
-                }
-            }
-          }
-
-          console.log(hostsArr);
+      for(let i=0; i < hostsArr.length; i++){         
+        if(hostsArr[i].room === data.room){
+            hostsArr[i].userCount--; 
+        }
+    }
     });
 
 
@@ -185,24 +175,24 @@ io.sockets.on('connection', function(socket) {
   });
   
   // removeHost such as SYNTH component UNMOUNT. ie. Navigate away.
-  // socket.on('removeHost', function() {
+  socket.on('removeHost', function() {
       
-  //   console.log('Host has removed itself');
+    console.log('Host has removed itself');
 
-  //     for(let i=0; i < hostsArr.length; i++){         
-  //         if(hostsArr[i].hostSocket === socket.id){
-  //             hostsArr.splice(i,1); 
-  //         }
-  //     }
+      for(let i=0; i < hostsArr.length; i++){         
+          if(hostsArr[i].hostSocket === socket.id){
+              hostsArr.splice(i,1); 
+          }
+      }
 
-  //     // send everybody a message saying the host as disconnected
-  //     io.emit('exit', socket.id); 
-  //     io.sockets.emit('getHosts', hostsArr)
-  //     console.log(socket.id + ' has disconnected itself');
-  //     console.log('Remaining hosts are:');
-  //     console.log(hostsArr);
+      // send everybody a message saying the host as disconnected
+      io.emit('exit', socket.id); 
+      io.sockets.emit('getHosts', hostsArr)
+      console.log(socket.id + ' has disconnected itself');
+      console.log('Remaining hosts are:');
+      console.log(hostsArr);
 
-  // });
+  });
 
 
     // on DISCONNECT or CLOSE TAB remove host from hosts list
@@ -211,66 +201,29 @@ io.sockets.on('connection', function(socket) {
       console.log('DISCONNECT');
       console.log(reason);
 
-      let wasHost = false;
+        for(let i=0; i < hostsArr.length; i++){         
+            if(hostsArr[i].hostSocket === socket.id){
+                hostsArr.splice(i,1); 
+            }
+        }
 
-          for(let i=0; i < hostsArr.length; i++){  
-              if(hostsArr[i].hostSocket === socket.id){
-                    
-                    console.log('a host has disconnected - the watchers have been notified DC FUNC HOST DC');
-                    // msg each of the watchers
-                    // for(let j=0; j < hostsArr[i].users.length; j++) {
-                    //     socket.to(hostsArr[i].users[j]).emit("disconnectHost", socket.id);
-                    // }
-
-
-                    //msg everyone in room that host has dc'd
-                    io.sockets.in(hostsArr[i].room).emit('disconnectedHost', socket.id);
-
-                    wasHost = true;
-                    hostsArr.splice(i,1); 
-              }
-          }
-          if (wasHost === false) {
-
-              for(let i=0; i < hostsArr.length; i++){
-                  for(let j=0; j < hostsArr[i].users.length; j++) {
-                      if (hostsArr[i].users[j] === socket.id) {
-                        console.log('a user has disconnected - the host has been notified  DC FUNC USER DC');
-
-                        socket.to(hostsArr[i].hostSocket).emit("disonnectedUser", socket.id);
-                        // io.sockets.in(hostsArr[i].room).emit('disconnectedUser', socket.id);
-                        hostsArr[i].users.splice(j,1);
-                      }
-                  }
-              }
-          }
-
-        
         // send everybody a message saying the host as disconnected
-        // io.emit('exit', socket.id); 
-        // io.sockets.emit('getHosts', hostsArr)
-        // console.log(socket.id + ' has disconnected');
-        console.log('Hosts array after removals:');
+        io.emit('exit', socket.id); 
+        io.sockets.emit('getHosts', hostsArr)
+        console.log(socket.id + ' has disconnected');
+        console.log('Remaining hosts are:');
         console.log(hostsArr);
-
-        // socket.to(broadcaster).emit("disconnectPeer", socket.id);
 
     });
 
 
     //web rtc stuff
+
+
     
     socket.on('initiate-video', function(data) {
       console.log('passing initate-video message:');
       console.log(data);
-      
-      // add the joining user to the user array in the hostarr object
-      for(let i=0; i < hostsArr.length; i++){         
-        if(hostsArr[i].room === data.room){
-            hostsArr[i].users.push(data.msg); 
-        }
-      }
-      // relay msg (data.msg is the joining users socketID)
       io.sockets.in(data.room).emit('initiate-video', data.msg);
     });
 
@@ -302,6 +255,8 @@ io.sockets.on('connection', function(socket) {
       console.log('make answer');
 
     });
+
+
 
 
 

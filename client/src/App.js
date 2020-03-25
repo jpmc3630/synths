@@ -157,7 +157,7 @@ class App extends Component {
                 
                   </div>
 
-                  
+              
                   
                     <Switch>
                       <Route exact path="/local">

@@ -8,10 +8,14 @@ import Menu, { Item as MenuItem } from 'rc-menu';
 import '../dropdown.css';
 
 const { RTCPeerConnection, RTCSessionDescription } = window;
+var servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
 
 
-let peerConnections = {};
+var peerconnection1 = new RTCPeerConnection(servers);
 
+// myPeerConnectionsMap = {
+//    'pc1' : peerconnection1
+// };
 
 class HostSynth extends Component {
     constructor(props){
@@ -23,7 +27,7 @@ class HostSynth extends Component {
         conToSynth: false,
         currentRoom: null,
         peerConnectionCounter: 0,
-        isAlreadyCallingArr: [],
+        isAlreadyCalling: false,
         selectedMidiOutId: null,
         selectedMidiOutName: 'None',
         selectedMidiMap: 'Select',
@@ -43,12 +47,12 @@ class HostSynth extends Component {
         navigator.getUserMedia(
             { video: true, audio: true },
             stream => {
-            const localVideo = document.getElementById("local-video");
+              const localVideo = document.getElementById("local-video");
               if (localVideo) {
                 localVideo.srcObject = stream;
               }
 
-            //   stream.getTracks().forEach(track => peerconnection1.addTrack(track, stream));
+              stream.getTracks().forEach(track => peerconnection1.addTrack(track, stream));
               //suss on that one
             },
             error => {
@@ -56,84 +60,35 @@ class HostSynth extends Component {
             }
         );
 
-    // navigator.mediaDevices.getUserMedia({audio:true,video:true})
-    //     .then(stream => {
-    //         window.localStream = stream;
-    //     })
-    //     .catch( (err) =>{
-    //         console.log(err);
-    //     });
-    // // later you can do below
-    // // stop both video and audio
+        peerconnection1.oniceconnectionstatechange = () => {
+            // console.log(peerconnection1.iceConnectionState);
+            if(peerconnection1.iceConnectionState == 'disconnected') {
+                console.log('Disconnected');
 
+                peerconnection1.close();
+                peerconnection1 = null;
+                this.setState({isAlreadyCalling: false});
+                peerconnection1 = new RTCPeerConnection(servers);
 
-        // MY OLD CLOSER it was a bit shit
-        // peerconnection1.oniceconnectionstatechange = () => {
-        //     // console.log(peerconnection1.iceConnectionState);
-        //     if(peerconnection1.iceConnectionState == 'disconnected') {
-        //         console.log('Disconnected');
-
-        //         peerconnection1.close();
-        //         peerconnection1 = null;
-        //         this.setState({isAlreadyCalling: false});
-        //         peerconnection1 = new RTCPeerConnection(servers);
-
-        //         navigator.getUserMedia(
-        //             { video: true, audio: true },
-        //             stream => {
-        //             const localVideo = document.getElementById("local-video");
-        //             if (localVideo) {
-        //                 localVideo.srcObject = stream;
-        //             }
-        //             stream.getTracks().forEach(track => peerconnection1.addTrack(track, stream));
-        //             },
-        //             error => {
-        //             console.warn(error.message);
-        //             }
-        //         );
-        //     }
-        // }
-
-        this.props.socket.on('disonnectedUser', (id) => {
-            
-            console.log('a user has disconnected ---------------------------------');
-            // if (peerConnections[id]) {
-            //     peerConnections[id].close();
-            //     delete peerConnections[id];
-            // }
-            
-            let tempArr = this.state.isAlreadyCallingArr;
-            for(let i=0; i < tempArr.length; i++){  
-                if(tempArr[i] === id){
-                      
-                      console.log('found id, now removing from arrray');
-                      tempArr.splice(i,1); 
-                }
+                navigator.getUserMedia(
+                    { video: true, audio: true },
+                    stream => {
+                    const localVideo = document.getElementById("local-video");
+                    if (localVideo) {
+                        localVideo.srcObject = stream;
+                    }
+                    stream.getTracks().forEach(track => peerconnection1.addTrack(track, stream));
+                    },
+                    error => {
+                    console.warn(error.message);
+                    }
+                );
             }
-            this.setState({isAlreadyCallingArr: tempArr});
-    });
+        }
 
-
-
-        this.props.socket.on('removeUser', (id) => {
+        // this.props.socket.on('removeUser', (data) => {
             
-            console.log('a user has disconnected ---------------------------------');
-            // if (peerConnections[id]) {
-            //     peerConnections[id].close();
-            //     delete peerConnections[id];
-            // }
-            
-            let tempArr = this.state.isAlreadyCallingArr;
-            for(let i=0; i < tempArr.length; i++){  
-                if(tempArr[i] === id){
-                      
-                      console.log('found id, now removing from arrray');
-                      tempArr.splice(i,1); 
-                }
-            }
-            this.setState({isAlreadyCallingArr: tempArr});
-        });
-
+        //         console.log('removeUser message');
 
         //         peerconnection1.close();
                 
@@ -159,104 +114,67 @@ class HostSynth extends Component {
 
         // });
 
-        this.props.socket.on('initiate-video', (id) => {
+        this.props.socket.on('initiate-video', (data) => {
 
-            console.log('initiate video listener');
+            console.log(data);
+            this.callUser(data);
 
-            var servers= {
-                'iceServers': [
-                  {
-                    'urls': 'stun:stun.l.google.com:19302'
-                  },
-                  {
-                    'urls': 'turn:numb.viagenie.ca',
-                    'credential': 'thisismypass',
-                    'username': 'jamespmcglone@gmail.com'
-                }
-                ]
-              }
-
-            let peerConnection = new RTCPeerConnection(servers);
-            peerConnections[id] = peerConnection;
-          
-            const localVideo = document.getElementById("local-video");
-            if (localVideo) {
-            let stream = localVideo.srcObject;
-            stream.getTracks().forEach(track => peerConnections[id].addTrack(track, stream));
-            }
-
-
-            console.log(id);
-            this.callUser(id);
-
+            console.log(this.props.socket.id);
+            console.log(this.props.socket.id);
+            console.log(this.props.socket.id);
         });
 
 
 
         this.props.socket.on("answer-made", async data => {
             console.log('answer made');
-            console.log(data.socket);
-            await peerConnections[data.socket].setRemoteDescription(new RTCSessionDescription(data.answer));
+            await peerconnection1.setRemoteDescription(
+                new RTCSessionDescription(data.answer)
+            );
             
-            let arr = this.state.isAlreadyCallingArr;
-            let alreadyCalling = false;
-
-            for(let i=0; i < arr.length; i++){         
-                if(arr[i] === data.socket){
-                    alreadyCalling = true;
-                    console.log('found socket in already calling arr');
-                }
-            }
-
-            if (alreadyCalling === false) {
-                console.log('didnt find socket in already calling arr, now added');
-                arr.push(data.socket);
-                this.setState({isAlreadyCallingArr: arr});
+            if (!this.state.isAlreadyCalling) {
                 this.callUser(data.socket);
-            }
-
-        });
-
-
-
-        //closing connections on user disconnect msg
-        this.props.socket.on("disonnectedUser", id => {
-            if (peerConnections[id]) {
-            peerConnections[id].close();
-            delete peerConnections[id];
+                this.setState({isAlreadyCalling: true});
             }
         });
-        //if window closes, send a close message
-        window.onunload = window.onbeforeunload = () => {
-            this.props.socket.close();
-        };
+
+        peerconnection1.ontrack = function({ streams: [stream] }) {
+            const remoteVideo = document.getElementById("remote-video");
+            if (remoteVideo) {
+            remoteVideo.srcObject = stream;
+            }
+       };
 
     }
 
     componentWillUnmount() {
         this.props.socket.emit('removeHost');
-
-        // const localVideo = document.getElementById("local-video");
-        // localVideo.srcObject.getTracks().forEach( (track) => {
-        //     track.stop();
-        // });
-
         WebMidi.disable();
     }
 
-    async callUser(socketId) {
-        console.log('call user function');
-        console.log(socketId);
+    logSignalState = () => {
+        console.log(peerconnection1.signalingState);
+    }
 
-        const offer = await peerConnections[socketId].createOffer();
-        await peerConnections[socketId].setLocalDescription(new RTCSessionDescription(offer));
+    resetIsCallingVar = () => {
+        console.log(servers);
+        this.setState({
+            highlightedParam: null,
+            peerConnection: new RTCPeerConnection(servers),
+            isAlreadyCalling: false,
+          });
+        console.log(this.state.isAlreadyCalling);
+    }
+
+    async callUser(socketId) {
+        const offer = await peerconnection1.createOffer();
+        await peerconnection1.setLocalDescription(new RTCSessionDescription(offer));
         
         this.props.socket.emit("call-user", {
             offer,
             to: socketId
         });
-
-        // console.log(offer);
+        console.log(offer);
     };
 
 
@@ -295,13 +213,17 @@ class HostSynth extends Component {
                 this.randomPatch();
             }
         });
-        this.props.socket.on('roomStatus', (data) => {
-            
-                this.updateRoomStatus(data);
-            
-        });
 
 
+
+
+        //     if (data === 'removeUser') {
+        //         console.log('Trying to reset connection');
+                // this.setState({
+                //     highlightedParam: null,
+                //     peerConnection: new RTCPeerConnection(servers),
+                //     isAlreadyCalling: false,
+                //   });
 
 
         //           navigator.getUserMedia(
@@ -352,10 +274,6 @@ class HostSynth extends Component {
 
     }
     
-    updateRoomStatus = (data) => {
-        this.setState({roomStatus: data});
-    }
-
     loadPatch = (patchArr) => {
         if (Array.isArray(patchArr)) {
             console.log(patchArr);
@@ -516,31 +434,23 @@ class HostSynth extends Component {
                     
 
                     <div style={{ columnCount:5}}>
+                    <button className="synthToolButton" onClick={this.resetIsCallingVar}>Reset Calling Variable</button>
+                    <button className="synthToolButton" onClick={this.logSignalState}>logSignalState</button>
                     {statusArr.length <= 0
                     ? <div className="status-div"></div>
                     : statusArr.map((param, index) => (
                         <div key={index} style={index === this.state.highlightedParam ? {color:'#f50057'} : {}}>
-                            {index} : {param}
-                        </div>
-                    ))}
+                        {index} : {param}
+                        
+                    </div>
 
-                </div>
-
-                {/* <div className="video-container">
-                    
-                </div> */}
-                <div><br></br>
-                    Connected Users:<br></br>
-                    {this.state.isAlreadyCallingArr.length <= 0
-                    ? <div className="status-div">No users connected.</div>
-                    :
-                    this.state.isAlreadyCallingArr.map((param, index) => (
-                        <div key={index}>
-                            {param}<br></br>
-                        </div>
                     ))}
                 </div>
+
+                <div className="video-container">
                     
+                </div>
+
             </div>
           </div>
         );
