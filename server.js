@@ -230,7 +230,6 @@ io.sockets.on('connection', function(socket) {
                     hostsArr.splice(i,1); 
               }
           }
-
           if (wasHost === false) {
 
               for(let i=0; i < hostsArr.length; i++){

@@ -8,7 +8,6 @@ import Menu, { Item as MenuItem } from 'rc-menu';
 import '../dropdown.css';
 
 const { RTCPeerConnection, RTCSessionDescription } = window;
-var servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
 
 
 const peerConnections = {};
@@ -163,8 +162,8 @@ class HostSynth extends Component {
         this.props.socket.on('initiate-video', (id) => {
 
             console.log('initiate video listener');
-            console.log(id);
 
+            const servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
             const peerConnection = new RTCPeerConnection(servers);
             peerConnections[id] = peerConnection;
           
@@ -231,20 +230,6 @@ class HostSynth extends Component {
         // });
 
         WebMidi.disable();
-    }
-
-    logSignalState = () => {
-        console.log(peerConnections);
-    }
-
-    resetIsCallingVar = () => {
-        console.log(servers);
-        this.setState({
-            highlightedParam: null,
-            peerConnection: new RTCPeerConnection(servers),
-            isAlreadyCalling: false,
-          });
-        console.log(this.state.isAlreadyCalling);
     }
 
     async callUser(socketId) {
@@ -519,23 +504,31 @@ class HostSynth extends Component {
                     
 
                     <div style={{ columnCount:5}}>
-                    <button className="synthToolButton" onClick={this.resetIsCallingVar}>Reset Calling Variable</button>
-                    <button className="synthToolButton" onClick={this.logSignalState}>logSignalState</button>
                     {statusArr.length <= 0
                     ? <div className="status-div"></div>
                     : statusArr.map((param, index) => (
                         <div key={index} style={index === this.state.highlightedParam ? {color:'#f50057'} : {}}>
-                        {index} : {param}
-                        
-                    </div>
+                            {index} : {param}
+                        </div>
+                    ))}
 
+                </div>
+
+                {/* <div className="video-container">
+                    
+                </div> */}
+                <div><br></br>
+                    Connected Users:<br></br>
+                    {this.state.isAlreadyCallingArr.length <= 0
+                    ? <div className="status-div">No users connected.</div>
+                    :
+                    this.state.isAlreadyCallingArr.map((param, index) => (
+                        <div key={index}>
+                            {param}<br></br>
+                        </div>
                     ))}
                 </div>
-
-                <div className="video-container">
                     
-                </div>
-
             </div>
           </div>
         );

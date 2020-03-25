@@ -12,7 +12,6 @@ import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
 import '../pianoStyles.css';
 
 const { RTCPeerConnection, RTCSessionDescription } = window;
-var servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
 
 const peerConnections = {};
 let tally = 44;
@@ -63,9 +62,7 @@ class RemoteSynth extends Component {
         // listener for RTC call
             this.props.socket.on("call-made", async data => {
 
-                console.log(tally);
-                
-                
+                const servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
                 const peerConnection = new RTCPeerConnection(servers);
                 peerConnections[tally] = peerConnection;
                 // peerConnections[tally].restartIce();
