@@ -14,6 +14,10 @@ import '../pianoStyles.css';
 const { RTCPeerConnection, RTCSessionDescription } = window;
 var servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
 
+const peerConnections = {};
+let tally = 44;
+
+
 class RemoteSynth extends Component {
     constructor(props){
       super(props);
@@ -25,8 +29,8 @@ class RemoteSynth extends Component {
         conToHost: false,
         value: 50,
         currentRoom: this.props.currentRoom,
+        currentPC: 0,
         viewColumns: 4,
-        peerConnection: new RTCPeerConnection(servers),
         patches: ['Buzz', 'Voices', 'Tinky'],
         patchValues: [[102, 48, 119, 94, 31, 56, 46, 69, 108, 52, 96, 67, 88, 77, 83, 126, 85, 56, 55, 31, 69, 113, 44, 75, 48, 11, 2, 62, 42, 35, 106, 30, 68, 60, 27, 1, 12, 78, 63, 40, 41, 78, 28, 90, 1, 7, 19, 117, 108, 57, 19, 0, 16, 19, 86, 64, 23, 19, 52, 121, 113, 111, 1, 100, 22, 70, 51, 12, 7, 103, 3, 99, 62, 10, 48, 31, 65, 9, 100, 28, 111, 123, 93, 3, 72, 121, 67, 103, 25, 26, 87, 42, 5, 39, 33, 7],[80, 3, 0, 107, 89, 108, 13, 90, 20, 61, 54, 74, 40, 110, 48, 38, 36, 39, 106, 38, 70, 116, 62, 108, 92, 79, 46, 14, 102, 19, 52, 61, 119, 104, 79, 72, 115, 104, 29, 54, 88, 74, 21, 90, 74, 40, 44, 32, 36, 101, 117, 126, 93, 76, 26, 55, 86, 116, 127, 119, 77, 22, 28, 78, 2, 122, 96, 119, 86, 39, 95, 37, 66, 105, 8, 30, 45, 82, 116, 96, 91, 106, 55, 87, 3, 76, 115, 27, 3, 35, 67, 71, 51, 18, 64, 87],[55, 0, 110, 18, 3, 0, 83, 127, 121, 41, 60, 59, 0, 3, 0, 81, 18, 125, 59, 61, 127, 127, 0, 116, 60, 28, 61, 60, 61, 66, 66, 22, 115, 52, 114, 4, 90, 10, 45, 98, 62, 24, 111, 19, 113, 48, 38, 81, 59, 71, 8, 109, 8, 28, 79, 0, 84, 96, 51, 7, 85, 78, 101, 36, 23, 75, 38, 57, 15, 124, 90, 76, 61, 64, 45, 82, 0, 38, 54, 72, 81, 95, 74, 56, 80, 64, 88, 57, 15, 49, 60, 68, 48, 62, 65, 74]]
         ,
@@ -34,15 +38,19 @@ class RemoteSynth extends Component {
       };
     }
     
-    componentDidMount() {
+    componentWillReceiveProps(nextProps, nextContext) {
+        tally++;
+    }
 
+    componentDidMount() {
+        
         // listner for socketIO data for statusArr
         this.props.socket.on('status', data => {
             this.setState({ statusArr: data, conToHost: true })
         });
+        
         console.log(this.props.socket.id);
-        console.log(this.props.socket.id);
-        console.log(this.props.socket.id);
+
         // will use for input midi device ie. input keyboard
         // WebMidi.enable( (err) => {
         //     console.log(WebMidi.inputs);
@@ -51,37 +59,73 @@ class RemoteSynth extends Component {
 
         this.requestStatusArr();
 
+        
         // listener for RTC call
             this.props.socket.on("call-made", async data => {
-                await this.state.peerConnection.setRemoteDescription(
+
+                console.log(tally);
+                
+                
+                const peerConnection = new RTCPeerConnection(servers);
+                peerConnections[tally] = peerConnection;
+                // peerConnections[tally].restartIce();
+                console.log(peerConnections[tally].iceConnectionState);
+
+                peerConnections[tally].ontrack = function({ streams: [stream] }) {
+                    const remoteVideo = document.getElementById("remote-video");
+                    if (remoteVideo) {
+                    remoteVideo.srcObject = stream;
+                    }
+                };
+
+                await peerConnections[tally].setRemoteDescription(
                 new RTCSessionDescription(data.offer)
                 );
-            const answer = await this.state.peerConnection.createAnswer();
-            await this.state.peerConnection.setLocalDescription(new RTCSessionDescription(answer));
+            const answer = await peerConnections[tally].createAnswer();
+            await peerConnections[tally].setLocalDescription(new RTCSessionDescription(answer));
             
                 this.props.socket.emit("make-answer", {
                     answer,
                     to: data.socket
                 });
-           });
+           
 
-           this.state.peerConnection.ontrack = function({ streams: [stream] }) {
-            const remoteVideo = document.getElementById("remote-video");
-            if (remoteVideo) {
-            remoteVideo.srcObject = stream;
-            }
-       };
+
+                console.log(peerConnections[tally].iceConnectionState);
+  
+        });
+
+
 
         console.log('sending initiate video to room');
            console.log(this.state.currentRoom);
+           // here the host sends the very first message that kicks the stream off ....
         this.props.socket.emit('initiate-video', {room: this.state.currentRoom, msg: this.props.socket.id});
 
+        
+        this.props.socket.on('disconnectedHost', (id) => {
+            peerConnections[tally].close();
+            this.setState({ statusArr: [], conToHost: false })
+            alert('The host has gone offline, please return to the join lobby');
+        });
+
+        // window.onunload = window.onbeforeunload = () => {
+        //     this.props.socket.close();
+        //     peerConnections[tally].close(); //i added this here - maybe not necessary
+        //   };
+
     }
+
+
     
     componentWillUnmount() {
         this.props.socket.emit('removeUser', {room: this.state.currentRoom, msg: `removeUser`}); //needs removeUser function in server
-        this.setState({ statusArr: [], conToHost: false });
-        WebMidi.disable();
+        // this.setState({ statusArr: [], conToHost: false });
+        
+        // WebMidi.disable();
+        
+        // this.props.socket.close();
+        // peerConnections[id].close(); //i added this here - maybe not necessary
     }
 
     requestStatusArr = () => {

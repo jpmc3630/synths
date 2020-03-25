@@ -11,11 +11,8 @@ const { RTCPeerConnection, RTCSessionDescription } = window;
 var servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
 
 
-var peerconnection1 = new RTCPeerConnection(servers);
+const peerConnections = {};
 
-// myPeerConnectionsMap = {
-//    'pc1' : peerconnection1
-// };
 
 class HostSynth extends Component {
     constructor(props){
@@ -27,7 +24,7 @@ class HostSynth extends Component {
         conToSynth: false,
         currentRoom: null,
         peerConnectionCounter: 0,
-        isAlreadyCalling: false,
+        isAlreadyCallingArr: [],
         selectedMidiOutId: null,
         selectedMidiOutName: 'None',
         selectedMidiMap: 'Select',
@@ -47,12 +44,12 @@ class HostSynth extends Component {
         navigator.getUserMedia(
             { video: true, audio: true },
             stream => {
-              const localVideo = document.getElementById("local-video");
+            const localVideo = document.getElementById("local-video");
               if (localVideo) {
                 localVideo.srcObject = stream;
               }
 
-              stream.getTracks().forEach(track => peerconnection1.addTrack(track, stream));
+            //   stream.getTracks().forEach(track => peerconnection1.addTrack(track, stream));
               //suss on that one
             },
             error => {
@@ -60,77 +57,184 @@ class HostSynth extends Component {
             }
         );
 
-
-        peerconnection1.oniceconnectionstatechange = () => {
-            console.log(peerconnection1.iceConnectionState);
-            if(peerconnection1.iceConnectionState == 'disconnected') {
-                console.log('Disconnected');
-
-                peerconnection1.close();
-                
-                peerconnection1 = null;
-                this.setState({isAlreadyCalling: false});
-                peerconnection1 = new RTCPeerConnection(servers);
+    // navigator.mediaDevices.getUserMedia({audio:true,video:true})
+    //     .then(stream => {
+    //         window.localStream = stream;
+    //     })
+    //     .catch( (err) =>{
+    //         console.log(err);
+    //     });
+    // // later you can do below
+    // // stop both video and audio
 
 
-                navigator.getUserMedia(
-                    { video: true, audio: true },
-                    stream => {
-                    const localVideo = document.getElementById("local-video");
-                    if (localVideo) {
-                        localVideo.srcObject = stream;
-                    }
+        // MY OLD CLOSER it was a bit shit
+        // peerconnection1.oniceconnectionstatechange = () => {
+        //     // console.log(peerconnection1.iceConnectionState);
+        //     if(peerconnection1.iceConnectionState == 'disconnected') {
+        //         console.log('Disconnected');
 
-                    stream.getTracks().forEach(track => peerconnection1.addTrack(track, stream));
-                    //suss on that one
-                    },
-                    error => {
-                    console.warn(error.message);
-                    }
-                );
+        //         peerconnection1.close();
+        //         peerconnection1 = null;
+        //         this.setState({isAlreadyCalling: false});
+        //         peerconnection1 = new RTCPeerConnection(servers);
+
+        //         navigator.getUserMedia(
+        //             { video: true, audio: true },
+        //             stream => {
+        //             const localVideo = document.getElementById("local-video");
+        //             if (localVideo) {
+        //                 localVideo.srcObject = stream;
+        //             }
+        //             stream.getTracks().forEach(track => peerconnection1.addTrack(track, stream));
+        //             },
+        //             error => {
+        //             console.warn(error.message);
+        //             }
+        //         );
+        //     }
+        // }
+
+        this.props.socket.on('disonnectedUser', (id) => {
+            
+            console.log('a user has disconnected ---------------------------------');
+            // if (peerConnections[id]) {
+            //     peerConnections[id].close();
+            //     delete peerConnections[id];
+            // }
+            
+            let tempArr = this.state.isAlreadyCallingArr;
+            for(let i=0; i < tempArr.length; i++){  
+                if(tempArr[i] === id){
+                      
+                      console.log('found id, now removing from arrray');
+                      tempArr.splice(i,1); 
+                }
             }
-        }
+            this.setState({isAlreadyCallingArr: tempArr});
+    });
 
-        this.props.socket.on('initiate-video', (data) => {
 
-            console.log(data);
-            this.callUser(data);
 
-            console.log(this.props.socket.id);
-            console.log(this.props.socket.id);
-            console.log(this.props.socket.id);
+        this.props.socket.on('removeUser', (id) => {
+            
+            console.log('a user has disconnected ---------------------------------');
+            // if (peerConnections[id]) {
+            //     peerConnections[id].close();
+            //     delete peerConnections[id];
+            // }
+            
+            let tempArr = this.state.isAlreadyCallingArr;
+            for(let i=0; i < tempArr.length; i++){  
+                if(tempArr[i] === id){
+                      
+                      console.log('found id, now removing from arrray');
+                      tempArr.splice(i,1); 
+                }
+            }
+            this.setState({isAlreadyCallingArr: tempArr});
+        });
+
+
+        //         peerconnection1.close();
+                
+        //         peerconnection1 = null;
+        //         this.setState({isAlreadyCalling: false});
+        //         peerconnection1 = new RTCPeerConnection(servers);
+
+
+        //         navigator.getUserMedia(
+        //             { video: true, audio: true },
+        //             stream => {
+        //             const localVideo = document.getElementById("local-video");
+        //             if (localVideo) {
+        //                 localVideo.srcObject = stream;
+        //             }
+        //             stream.getTracks().forEach(track => peerconnection1.addTrack(track, stream));
+        //             },
+        //             error => {
+        //             console.warn(error.message);
+        //             }
+        //         );
+            
+
+        // });
+
+        this.props.socket.on('initiate-video', (id) => {
+
+            console.log('initiate video listener');
+            console.log(id);
+
+            const peerConnection = new RTCPeerConnection(servers);
+            peerConnections[id] = peerConnection;
+          
+            const localVideo = document.getElementById("local-video");
+            if (localVideo) {
+            let stream = localVideo.srcObject;
+            stream.getTracks().forEach(track => peerConnections[id].addTrack(track, stream));
+            }
+
+
+            console.log(id);
+            this.callUser(id);
+
         });
 
 
 
         this.props.socket.on("answer-made", async data => {
             console.log('answer made');
-            await peerconnection1.setRemoteDescription(
-                new RTCSessionDescription(data.answer)
-            );
+            console.log(data.socket);
+            await peerConnections[data.socket].setRemoteDescription(new RTCSessionDescription(data.answer));
             
-            if (!this.state.isAlreadyCalling) {
-                this.callUser(data.socket);
-                this.setState({isAlreadyCalling: true});
+            let arr = this.state.isAlreadyCallingArr;
+            let alreadyCalling = false;
+
+            for(let i=0; i < arr.length; i++){         
+                if(arr[i] === data.socket){
+                    alreadyCalling = true;
+                    console.log('found socket in already calling arr');
+                }
             }
+
+            if (alreadyCalling === false) {
+                console.log('didnt find socket in already calling arr, now added');
+                arr.push(data.socket);
+                this.setState({isAlreadyCallingArr: arr});
+                this.callUser(data.socket);
+            }
+
         });
 
-        peerconnection1.ontrack = function({ streams: [stream] }) {
-            const remoteVideo = document.getElementById("remote-video");
-            if (remoteVideo) {
-            remoteVideo.srcObject = stream;
+
+
+        //closing connections on user disconnect msg
+        this.props.socket.on("disonnectedUser", id => {
+            if (peerConnections[id]) {
+            peerConnections[id].close();
+            delete peerConnections[id];
             }
-       };
+        });
+        //if window closes, send a close message
+        window.onunload = window.onbeforeunload = () => {
+            this.props.socket.close();
+        };
 
     }
 
     componentWillUnmount() {
         this.props.socket.emit('removeHost');
+
+        // const localVideo = document.getElementById("local-video");
+        // localVideo.srcObject.getTracks().forEach( (track) => {
+        //     track.stop();
+        // });
+
         WebMidi.disable();
     }
 
     logSignalState = () => {
-        console.log(peerconnection1.signalingState);
+        console.log(peerConnections);
     }
 
     resetIsCallingVar = () => {
@@ -144,14 +248,18 @@ class HostSynth extends Component {
     }
 
     async callUser(socketId) {
-        const offer = await peerconnection1.createOffer();
-        await peerconnection1.setLocalDescription(new RTCSessionDescription(offer));
+        console.log('call user function');
+        console.log(socketId);
+
+        const offer = await peerConnections[socketId].createOffer();
+        await peerConnections[socketId].setLocalDescription(new RTCSessionDescription(offer));
         
         this.props.socket.emit("call-user", {
             offer,
             to: socketId
         });
-        console.log(offer);
+
+        // console.log(offer);
     };
 
 
@@ -190,15 +298,13 @@ class HostSynth extends Component {
                 this.randomPatch();
             }
         });
+        this.props.socket.on('roomStatus', (data) => {
+            
+                this.updateRoomStatus(data);
+            
+        });
 
-        // this.props.socket.on('removeUser', (data) => {
-        //     if (data === 'removeUser') {
-        //         console.log('Trying to reset connection');
-                // this.setState({
-                //     highlightedParam: null,
-                //     peerConnection: new RTCPeerConnection(servers),
-                //     isAlreadyCalling: false,
-                //   });
+
 
 
         //           navigator.getUserMedia(
@@ -244,11 +350,15 @@ class HostSynth extends Component {
         //        };
         //     }
             
-        // });
+
 
 
     }
     
+    updateRoomStatus = (data) => {
+        this.setState({roomStatus: data});
+    }
+
     loadPatch = (patchArr) => {
         if (Array.isArray(patchArr)) {
             console.log(patchArr);
