@@ -13,7 +13,7 @@ import '../pianoStyles.css';
 
 const { RTCPeerConnection, RTCSessionDescription } = window;
 
-const peerConnections = {};
+let peerConnections = {};
 let tally = 44;
 
 
@@ -61,12 +61,12 @@ class RemoteSynth extends Component {
         
         // listener for RTC call
             this.props.socket.on("call-made", async data => {
-
-                const servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
-                const peerConnection = new RTCPeerConnection(servers);
+                console.log(tally);
+                let servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
+                let peerConnection = new RTCPeerConnection(servers);
                 peerConnections[tally] = peerConnection;
                 // peerConnections[tally].restartIce();
-                console.log(peerConnections[tally].iceConnectionState);
+                // console.log(peerConnections[tally].iceConnectionState);
 
                 peerConnections[tally].ontrack = function({ streams: [stream] }) {
                     const remoteVideo = document.getElementById("remote-video");
@@ -88,7 +88,7 @@ class RemoteSynth extends Component {
            
 
 
-                console.log(peerConnections[tally].iceConnectionState);
+                // console.log(peerConnections[tally].iceConnectionState);
   
         });
 

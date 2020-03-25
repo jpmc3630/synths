@@ -10,7 +10,7 @@ import '../dropdown.css';
 const { RTCPeerConnection, RTCSessionDescription } = window;
 
 
-const peerConnections = {};
+let peerConnections = {};
 
 
 class HostSynth extends Component {
@@ -163,8 +163,8 @@ class HostSynth extends Component {
 
             console.log('initiate video listener');
 
-            const servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
-            const peerConnection = new RTCPeerConnection(servers);
+            let servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
+            let peerConnection = new RTCPeerConnection(servers);
             peerConnections[id] = peerConnection;
           
             const localVideo = document.getElementById("local-video");
