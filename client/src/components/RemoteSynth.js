@@ -70,7 +70,10 @@ class RemoteSynth extends Component {
                 var servers= {
                     'iceServers': [
                       {
-                        'url': 'turn:numb.viagenie.ca',
+                        'urls': 'stun:stun.l.google.com:19302'
+                      },
+                      {
+                        'urls': 'turn:numb.viagenie.ca',
                         'credential': 'thisismypass',
                         'username': 'jamespmcglone@gmail.com'
                     }
