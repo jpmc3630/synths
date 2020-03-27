@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-
+import { Redirect } from 'react-router-dom'
 import LocalSynth from "./LocalSynth"
 
 
@@ -14,16 +14,16 @@ class Local extends Component {
 
 
     render() {
-  
-      return (
-        
-        <div className="container">
-          Local Mode
 
-        <LocalSynth />
+        return (
+          
+          <div className="container">
+            Local Mode
 
-        </div>
-      );
+          <LocalSynth />
+
+          </div>
+        )
     }
   }
   

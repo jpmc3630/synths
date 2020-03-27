@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import WebMidi from "webmidi";
 import SocketContext from '../context/socket-context.js'
+import UserContext from '../context/user-context.js';
 
 import Slider from '@material-ui/core/Slider';
 import Dropdown from 'rc-dropdown';
@@ -27,7 +28,7 @@ class RemoteSynth extends Component {
         value: 50,
         currentRoom: this.props.currentRoom,
         viewColumns: 4,
-        
+        status: 'Connecting to host synth...',
         patches: ['Buzz', 'Voices', 'Tinky'],
         patchValues: [[102, 48, 119, 94, 31, 56, 46, 69, 108, 52, 96, 67, 88, 77, 83, 126, 85, 56, 55, 31, 69, 113, 44, 75, 48, 11, 2, 62, 42, 35, 106, 30, 68, 60, 27, 1, 12, 78, 63, 40, 41, 78, 28, 90, 1, 7, 19, 117, 108, 57, 19, 0, 16, 19, 86, 64, 23, 19, 52, 121, 113, 111, 1, 100, 22, 70, 51, 12, 7, 103, 3, 99, 62, 10, 48, 31, 65, 9, 100, 28, 111, 123, 93, 3, 72, 121, 67, 103, 25, 26, 87, 42, 5, 39, 33, 7],[80, 3, 0, 107, 89, 108, 13, 90, 20, 61, 54, 74, 40, 110, 48, 38, 36, 39, 106, 38, 70, 116, 62, 108, 92, 79, 46, 14, 102, 19, 52, 61, 119, 104, 79, 72, 115, 104, 29, 54, 88, 74, 21, 90, 74, 40, 44, 32, 36, 101, 117, 126, 93, 76, 26, 55, 86, 116, 127, 119, 77, 22, 28, 78, 2, 122, 96, 119, 86, 39, 95, 37, 66, 105, 8, 30, 45, 82, 116, 96, 91, 106, 55, 87, 3, 76, 115, 27, 3, 35, 67, 71, 51, 18, 64, 87],[55, 0, 110, 18, 3, 0, 83, 127, 121, 41, 60, 59, 0, 3, 0, 81, 18, 125, 59, 61, 127, 127, 0, 116, 60, 28, 61, 60, 61, 66, 66, 22, 115, 52, 114, 4, 90, 10, 45, 98, 62, 24, 111, 19, 113, 48, 38, 81, 59, 71, 8, 109, 8, 28, 79, 0, 84, 96, 51, 7, 85, 78, 101, 36, 23, 75, 38, 57, 15, 124, 90, 76, 61, 64, 45, 82, 0, 38, 54, 72, 81, 95, 74, 56, 80, 64, 88, 57, 15, 49, 60, 68, 48, 62, 65, 74]]
         ,
@@ -41,13 +42,10 @@ class RemoteSynth extends Component {
         this.props.socket.on('status', data => {
             this.setState({ statusArr: data, conToHost: true })
         });
-        console.log(this.props.socket.id);
-        console.log(this.props.socket.id);
-        console.log(this.props.socket.id);
+
         // will use for input midi device ie. input keyboard
         // WebMidi.enable( (err) => {
         //     console.log(WebMidi.inputs);
-        //     console.log(WebMidi.outputs);
         // }, true);   
 
         this.requestStatusArr();
@@ -64,7 +62,8 @@ class RemoteSynth extends Component {
             
                 this.props.socket.emit("make-answer", {
                     answer,
-                    to: data.socket
+                    to: data.socket,
+                    name: this.props.user
                 });
            });
 
@@ -75,10 +74,14 @@ class RemoteSynth extends Component {
             }
        };
 
-        console.log('sending initiate video to room');
-           console.log(this.state.currentRoom);
-        this.props.socket.emit('initiate-video', {room: this.state.currentRoom, msg: this.props.socket.id});
+       // host has disconnected
+       this.props.socket.on('disconnectedHost', data => {
+        
+        this.setState({ statusArr: [], conToHost: false, status: 'The host has stopped hosting!' });
+        });
 
+        // send initialise video message to room
+        this.props.socket.emit('initiate-video', {room: this.state.currentRoom, msg: this.props.socket.id});
     }
     
     componentWillUnmount() {
@@ -332,7 +335,7 @@ class RemoteSynth extends Component {
 
 
                 {(this.state.conToHost === false)
-                ? <div>Not connected to host</div>
+                ? <div>{this.state.status}</div>
                 : 
                 <div>
 
@@ -430,9 +433,13 @@ class RemoteSynth extends Component {
 }
   
 const RemoteSynthWithSocket = props => (
-    <SocketContext.Consumer>
-    {socket => <RemoteSynth {...props} socket={socket} />}
-    </SocketContext.Consumer>
-  )
+    <UserContext.Consumer>
+    {user => (    
+        <SocketContext.Consumer>
+        {socket => <RemoteSynth {...props} socket={socket} user={user} />}
+        </SocketContext.Consumer>
+    )}
+    </UserContext.Consumer>    
+)
     
   export default RemoteSynthWithSocket;

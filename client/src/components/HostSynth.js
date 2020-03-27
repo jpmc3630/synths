@@ -104,7 +104,7 @@ class HostSynth extends Component {
             
             let tempArr = this.state.isAlreadyCallingArr;
             for(let i=0; i < tempArr.length; i++){  
-                if(tempArr[i] === id){
+                if(tempArr[i].id === id){
                       
                       console.log('found id, now removing from arrray');
                       tempArr.splice(i,1); 
@@ -125,7 +125,7 @@ class HostSynth extends Component {
             
             let tempArr = this.state.isAlreadyCallingArr;
             for(let i=0; i < tempArr.length; i++){  
-                if(tempArr[i] === id){
+                if(tempArr[i].id === id){
                       
                       console.log('found id, now removing from arrray');
                       tempArr.splice(i,1); 
@@ -202,7 +202,7 @@ class HostSynth extends Component {
             let alreadyCalling = false;
 
             for(let i=0; i < arr.length; i++){         
-                if(arr[i] === data.socket){
+                if(arr[i].id === data.socket){
                     alreadyCalling = true;
                     console.log('found socket in already calling arr');
                 }
@@ -210,7 +210,7 @@ class HostSynth extends Component {
 
             if (alreadyCalling === false) {
                 console.log('didnt find socket in already calling arr, now added');
-                arr.push(data.socket);
+                arr.push({id: data.socket, name: data.name});
                 this.setState({isAlreadyCallingArr: arr});
                 this.callUser(data.socket);
             }
@@ -493,7 +493,7 @@ class HostSynth extends Component {
 
                                 <div className="form-group">
                                     <div className="col-2 col-ml-auto">
-                                        <label className="form-label" htmlFor="username">Room name:</label>
+                                        {/* <label className="form-label" htmlFor="username">Room name:</label> */}
                                     </div>
                                     <div className="col-3 col-mr-auto">
                                         <input className="form-input"
@@ -507,7 +507,10 @@ class HostSynth extends Component {
                                     </div>
                                 
                                     <div className="col-3 col-mr-auto">
-                                        <button className="synthToolButton" onClick={this.connectToSynth}>Connect to Synth</button>
+                                        {this.state.selectedMidiOutId === null 
+                                        ? <div><br></br><button className="synthToolButtonDisabled">Connect to Synth</button>
+                                        <br></br><br></br>No synth or midi interface detected. You need one to be a host!</div> 
+                                        : <div><br></br><button className="synthToolButton" onClick={this.connectToSynth}>Connect to Synth</button></div>}
                                     </div>
                                 </div>
                             </div>
@@ -529,17 +532,18 @@ class HostSynth extends Component {
                 {/* <div className="video-container">
                     
                 </div> */}
+                {this.state.conToSynth &&
                 <div><br></br>
                     Connected Users:<br></br>
                     {this.state.isAlreadyCallingArr.length <= 0
                     ? <div className="status-div">No users connected.</div>
                     :
-                    this.state.isAlreadyCallingArr.map((param, index) => (
+                    this.state.isAlreadyCallingArr.map((user, index) => (
                         <div key={index}>
-                            {param}<br></br>
+                            {user.name}<br></br>
                         </div>
                     ))}
-                </div>
+                </div>}
                     
             </div>
           </div>

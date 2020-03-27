@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-
+import { Redirect } from 'react-router-dom'
 import HostSynth from "./HostSynth"
 
 
@@ -14,17 +14,17 @@ class Host extends Component {
 
 
     render() {
-  
-      return (
-        
-        <div className="content">
-          Host Synth
-          <br/><br/>
 
-        <HostSynth />
+          return (
+            
+            <div className="content">
+              Host Synth
+              <br/><br/>
 
-        </div>
-      );
+            <HostSynth />
+
+            </div>
+          )
     }
   }
   

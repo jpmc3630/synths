@@ -185,24 +185,25 @@ io.sockets.on('connection', function(socket) {
   });
   
   // removeHost such as SYNTH component UNMOUNT. ie. Navigate away.
-  // socket.on('removeHost', function() {
+  socket.on('removeHost', function() {
       
-  //   console.log('Host has removed itself');
+    console.log('Host has removed itself');
 
-  //     for(let i=0; i < hostsArr.length; i++){         
-  //         if(hostsArr[i].hostSocket === socket.id){
-  //             hostsArr.splice(i,1); 
-  //         }
-  //     }
+      for(let i=0; i < hostsArr.length; i++){         
+          if(hostsArr[i].hostSocket === socket.id){
+              io.sockets.in(hostsArr[i].room).emit('disconnectedHost', socket.id);
+              hostsArr.splice(i,1); 
+          }
+      }
 
-  //     // send everybody a message saying the host as disconnected
-  //     io.emit('exit', socket.id); 
-  //     io.sockets.emit('getHosts', hostsArr)
-  //     console.log(socket.id + ' has disconnected itself');
-  //     console.log('Remaining hosts are:');
-  //     console.log(hostsArr);
+      // send everybody a message saying the host as disconnected
+      
+      io.sockets.emit('getHosts', hostsArr);
+      console.log('host: ' + socket.id + ' has disconnected itself');
+      console.log('Remaining hosts are:');
+      console.log(hostsArr);
 
-  // });
+  });
 
 
     // on DISCONNECT or CLOSE TAB remove host from hosts list
@@ -228,6 +229,7 @@ io.sockets.on('connection', function(socket) {
 
                     wasHost = true;
                     hostsArr.splice(i,1); 
+                    io.sockets.emit('getHosts', hostsArr);
               }
           }
           if (wasHost === false) {
@@ -240,6 +242,7 @@ io.sockets.on('connection', function(socket) {
                         socket.to(hostsArr[i].hostSocket).emit("disonnectedUser", socket.id);
                         // io.sockets.in(hostsArr[i].room).emit('disconnectedUser', socket.id);
                         hostsArr[i].users.splice(j,1);
+                        io.sockets.emit('getHosts', hostsArr);
                       }
                   }
               }
@@ -296,6 +299,7 @@ io.sockets.on('connection', function(socket) {
     socket.on("make-answer", data => {
       socket.to(data.to).emit("answer-made", {
         socket: socket.id,
+        name: data.name,
         answer: data.answer
       });
 

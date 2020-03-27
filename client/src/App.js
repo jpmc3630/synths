@@ -1,26 +1,19 @@
 import React, { Component } from 'react';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link
-} from "react-router-dom";
-import axios from 'axios';
+import {BrowserRouter as Router, Switch, Route, Link, Redirect} from "react-router-dom";
 
 import "./App.css";
-
 import Local from "./components/Local";
 import Host from "./components/Host";
 import Join from "./components/Join";
-
 import Signup from './components/sign-up';
 import LoginForm from './components/login-form';
 import Home from './components/home';
 
 import UserContext from './context/user-context';
 import SocketContext from './context/socket-context';
-import io from "socket.io-client";
 
+import io from "socket.io-client";
+import axios from 'axios';
 
 let socket;
 if (process.env.NODE_ENV === 'development') {
@@ -29,7 +22,6 @@ if (process.env.NODE_ENV === 'development') {
   socket = io();
 }
 
-// `http://localhost:3001/`
 
 class App extends Component {
 
@@ -57,17 +49,12 @@ class App extends Component {
 
   getUser() {
     axios.get('/user/').then(response => {
-      console.log('Get user response: ')
-      console.log(response.data)
       if (response.data.user) {
-        console.log('Get User: There is a user saved in the server session: ')
-
         this.setState({
           loggedIn: true,
           username: response.data.user.username
         })
       } else {
-        console.log('Get user: no user');
         this.setState({
           loggedIn: false,
           username: null
@@ -78,7 +65,6 @@ class App extends Component {
 
   logout(event) {
     event.preventDefault()
-    console.log('logging out')
     axios.post('/user/logout').then(response => {
       console.log(response.data)
       if (response.status === 200) {
@@ -92,8 +78,24 @@ class App extends Component {
     })
   }
 
+
+  
   render() {
 
+    const ProtectedRoute = ({ component: Comp, loggedIn, path, ...rest }) => {
+      return (
+        <Route
+          path={path}
+          {...rest}
+          render={props => {
+            return loggedIn ? <Comp {...props} /> : <div className="content">You are not logged in.<br></br>
+                <Link to="/login" className="btn btn-link text-secondary">
+            <span className="text-secondary">LOGIN</span>
+          </Link></div>;
+          }}
+        />
+      );
+    };
 
     return (
         <UserContext.Provider value={this.state.username}>
@@ -125,9 +127,15 @@ class App extends Component {
                                 <Link to="/host" className="btn btn-link text-secondary">
                                   <span className="text-secondary">HOST</span>
                                 </Link>
+
+
                                 <Link to="/join" className="btn btn-link text-secondary">
                                   <span className="text-secondary">JOIN</span>
                                 </Link>
+
+
+
+
                             </div>
 
                           </div>
@@ -160,15 +168,10 @@ class App extends Component {
               
                   
                     <Switch>
-                      <Route exact path="/local">
-                        <Local />
-                      </Route>
-                      <Route exact path="/host">
-                        <Host />
-                      </Route>
-                      <Route path="/join">
-                        <Join />
-                      </Route>
+
+                      <ProtectedRoute path="/local" loggedIn={this.state.loggedIn} component={Local} />
+                      <ProtectedRoute path="/host" loggedIn={this.state.loggedIn} component={Host} />
+                      <ProtectedRoute path="/join" loggedIn={this.state.loggedIn} component={Join} />
 
                       <Route
                   exact path="/"

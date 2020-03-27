@@ -219,6 +219,22 @@ input[type=password] {
 }
 
 
+.synthToolButtonDisabled {
+
+  color: rgb(49, 49, 49);
+  background-color: black;
+  
+  padding: 10px;
+  margin: 10px;
+
+  border-radius: 3px;
+  box-shadow: 0 1px 5px rgb(49, 49, 49);
+  background-clip: padding-box;
+  border: 1px solid rgb(49, 49, 49);
+
+  pointer-events: none;
+}
+
 .nudgeLeft {
   position: relative;
   left: -20px;

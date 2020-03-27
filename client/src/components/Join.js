@@ -17,20 +17,14 @@ class Join extends Component {
   
    componentDidMount() {
 
-        console.log(this.props.socket.id);
-
         this.props.socket.emit('getHosts', 'kanichiwa');
-        console.log('emitting getHosts message');
 
         this.props.socket.on('getHosts', data => {
-            console.log('Incoming message:', data);
             this.setState({ hostsArr: data })
         });
     }
 
-
     connectToRoom = (roomName) => {
-      console.log('Connecting to... ' + roomName);
       this.props.socket.emit('joinRoom', roomName);
       this.setState({currentRoom: roomName})     
     }
@@ -41,15 +35,14 @@ class Join extends Component {
         return (
           
               <div className="content">
-                Join page
 
                 {this.state.hostsArr.length <= 0
                     ? <p>No synth hosts available right now...</p>
                     : this.state.hostsArr.map((host, index) => ( <p key={index+host.hostSocket}>
                       Host Available: <br></br>
                       {host.room} - Users: {host.userCount} : <button className="synthToolButton" onClick={() => this.connectToRoom(host.room)}>Join</button>
-                    </p> ))}
-                    
+                    </p> ))
+                }   
 
               </div>
               );
