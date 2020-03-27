@@ -235,6 +235,14 @@ input[type=password] {
   pointer-events: none;
 }
 
+.news-div {
+  position: relative;
+  width: 50%;
+  text-align: left;
+  margin: auto;
+
+}
+
 .nudgeLeft {
   position: relative;
   left: -20px;
