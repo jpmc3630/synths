@@ -17,8 +17,10 @@ a:hover {
 
 .synthToolButton:hover {
   color: #f50057;
-  text-decoration: none;
+  text-decoration: none !important;
+  
 }
+
 
 .header {
   margin-left: 10%;
@@ -201,6 +203,8 @@ input[type=password] {
   min-height: 200px;
   z-index: 10;
 }
+
+
 
 .synthToolButton {
 

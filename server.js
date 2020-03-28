@@ -239,7 +239,7 @@ io.sockets.on('connection', function(socket) {
                       if (hostsArr[i].users[j] === socket.id) {
                         console.log('a user has disconnected - the host has been notified  DC FUNC USER DC');
 
-                        socket.to(hostsArr[i].hostSocket).emit("disonnectedUser", socket.id);
+                        socket.to(hostsArr[i].hostSocket).emit("removeUser", socket.id);
                         // io.sockets.in(hostsArr[i].room).emit('disconnectedUser', socket.id);
                         hostsArr[i].users.splice(j,1);
                         io.sockets.emit('getHosts', hostsArr);

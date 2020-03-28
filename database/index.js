@@ -6,7 +6,11 @@ mongoose.Promise = global.Promise
 //27017 is the default mongoDB port
 const uri = 'mongodb+srv://synths:synthetica5000@synthscluster-a3ja4.mongodb.net/test?retryWrites=true&w=majority' 
 
-mongoose.connect(uri).then(
+mongoose.connect(uri, {
+    useNewUrlParser: true, 
+    useUnifiedTopology: true,
+    useCreateIndex: true
+    }).then(
     () => { 
         /** ready to use. The `mongoose.connect()` promise resolves to undefined. */ 
         console.log('Connected to Mongo');

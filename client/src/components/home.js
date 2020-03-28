@@ -31,20 +31,19 @@ class Home extends Component {
                 <div className="news-div">
                     <p>Pending - MIDI input - External input device for JOINERS. Use your MIDI keyboard for input. </p>
                     <p>Pending - Save Patch - Saving synth patches to your account (currently they don't actually persist, sorry!) </p>
-                    <p>Pending - Bug fix - Webcam not turning off once entered HOST route, until page close/refresh.</p>
+                    <p>27/3 - Webcam Bug fix - Webcam not turning off once entered HOST route, until page close/refresh.</p>
                     <p>26/3 - Security - The authentication shouldn't be doing annoying redirections any more, should you happen to refresh the page.</p>
                     <p>25/3 - Synth Hosting - WebRTC bug fix should be more robust. If you leave a synth hosted, expect it to run indefinately.</p>
-                    <p>15/3 - New MIDI Map added: Moog Slim Phatty. Update: The map is wrong though, lol! I'll get back to working on these soon once I've got a few general page bugs out of the way. In the mean time, the MS2000 map is correct.</p>
                 </div>
                 <br></br>
                             <Link to="/local" className="btn btn-link text-secondary">
-                                <span className="synthToolButton">LOCAL MODE</span>
+                                <span className="btn synthToolButton">LOCAL MODE</span>
                             </Link>
                             <Link to="/host" className="btn btn-link text-secondary">
-                                <span className="synthToolButton">HOST</span>
+                                <span className="btn synthToolButton">HOST</span>
                             </Link>
                             <Link to="/join" className="btn btn-link text-secondary">
-                                <span className="synthToolButton">JOIN</span>
+                                <span className="btn synthToolButton">JOIN</span>
                             </Link>
 
                 </div>
@@ -57,16 +56,19 @@ class Home extends Component {
                             <br></br><br></br>
                 
                     <Link to="/signup" className="btn btn-link">
-                        <span className="synthToolButton">SIGN UP</span>
+                        <span className="btn synthToolButton">SIGN UP</span>
                     </Link>
 
                     <Link to="/login" className="btn btn-link text-secondary">
-                        <span className="synthToolButton">LOGIN</span>
+                        <span className="btn synthToolButton">LOGIN</span>
                     </Link>
 
                             <br></br><br></br>
+                            <p> You are not logged in. </p>
+                            <br></br><br></br>
 
-                    <p> You are not logged in. You will need to log in or sign up to use this app.</p>
+                   
+                    <p>You will need to log in or sign up to use this app.</p>
                     <p> It's quick. You don't need to validate with email ;D</p>
                 </div>
                 

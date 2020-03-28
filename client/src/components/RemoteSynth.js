@@ -13,7 +13,6 @@ import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano';
 import '../pianoStyles.css';
 
 const { RTCPeerConnection, RTCSessionDescription } = window;
-var servers = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] };
 let peerConnection = {};
 
 class RemoteSynth extends Component {
@@ -50,6 +49,19 @@ class RemoteSynth extends Component {
 
         this.requestStatusArr();
 
+        var servers= {
+            'iceServers': [
+              {
+                'urls': 'stun:stun.l.google.com:19302'
+              },
+              {
+                'urls': 'turn:numb.viagenie.ca',
+                'credential': 'thisismypass',
+                'username': 'jamespmcglone@gmail.com'
+            }
+            ]
+          }
+
         peerConnection = new RTCPeerConnection(servers);
 
         // listener for RTC call
@@ -85,7 +97,7 @@ class RemoteSynth extends Component {
     }
     
     componentWillUnmount() {
-        this.props.socket.emit('removeUser', {room: this.state.currentRoom, msg: `removeUser`}); //needs removeUser function in server
+        this.props.socket.emit('removeUser', {room: this.state.currentRoom, msg: `removeUser`});
         this.setState({ statusArr: [], conToHost: false });
         WebMidi.disable();
     }
@@ -111,12 +123,9 @@ class RemoteSynth extends Component {
 
     sendStatusArr = (patchArr) => {
         this.props.socket.emit('sendConfig', {room: this.state.currentRoom, msg: patchArr});
-        console.log('send status');
     }
 
     sendPatch = ({key}) => {
-        console.log('send patch');
-        console.log(key);
         let patchArr = [];
         key = parseInt(key);
         let patchName = this.state.patches[key];

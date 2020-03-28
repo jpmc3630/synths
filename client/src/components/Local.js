@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { Redirect } from 'react-router-dom'
-import LocalSynth from "./LocalSynth"
+import LocalSynth from "./LocalSynth";
 
 
 class Local extends Component {
